@@ -39,12 +39,12 @@ class Model {
 		let self = this;
 
 		if (!callback) {
-			sql = `SELECT * FROM ${this.name}`;
+			sql = `SELECT * FROM '${this.name}'`;
 			callback = options;
 		} else if (options.constructor == Array) {
-			sql = `SELECT ${options.join()} FROM ${this.name}`;
+			sql = `SELECT ${options.join()} FROM '${this.name}'`;
 		} else {
-			sql = `SELECT * FROM ${this.name} WHERE ${options}`;
+			sql = `SELECT * FROM '${this.name}' WHERE ${options}`;
 		};
 		plus.sqlite.selectSql({
 			name: self.db,
@@ -67,10 +67,10 @@ class Model {
 		var sql = '';
 		let self = this;
 		if (!options.where) {
-			sql = `SELECT * FROM ${this.name} LIMIT ${options.count} OFFSET ${(options.number - 1) * options.count}`
+			sql = `SELECT * FROM '${this.name}' LIMIT ${options.count} OFFSET ${(options.number - 1) * options.count}`
 		} else {
 			sql =
-				`SELECT * FROM ${this.name} WHERE ${options.where} LIMIT ${options.count} OFFSET ${(options.number - 1) * options.count}`;
+				`SELECT * FROM '${this.name}' WHERE ${options.where} LIMIT ${options.count} OFFSET ${(options.number - 1) * options.count}`;
 		};
 		plus.sqlite.selectSql({
 			name: self.db,
@@ -111,10 +111,10 @@ class Model {
 		let self = this;
 		for (var key in obj) {
 			keys.push(key);
-			values += `"${obj[key]}",`;
+			values += `'${obj[key]}',`;
 		};
 		values = values.replace(/,$/, '');
-		let sql = `INSERT INTO ${this.name} (${keys.join()}) VALUES (${values})`;
+		let sql = `INSERT INTO '${this.name}' (${keys.join()}) VALUES (${values})`;
 		console.log(sql);
 		plus.sqlite.executeSql({
 			name: self.db,
@@ -140,7 +140,7 @@ class Model {
 		if (arguments.length == 2) {
 			callback = obj;
 			obj = option;
-			sql = `UPDATE ${this.name} SET `;
+			sql = `UPDATE '${this.name}' SET `;
 			for (var key in obj) {
 				sql += `${key}='${obj[key]}', `;
 			};
@@ -174,10 +174,10 @@ class Model {
 		var sql = '';
 		let self = this;
 		if (!callback) {
-			sql = `DELETE FROM ${this.name}`;
+			sql = `DELETE FROM '${this.name}'`;
 			callback = option;
 		} else {
-			sql = `DELETE FROM ${this.name} WHERE ${option}`;
+			sql = `DELETE FROM '${this.name}' WHERE ${option}`;
 		};
 		plus.sqlite.executeSql({
 			name: self.db,
@@ -216,7 +216,7 @@ class Model {
 	 * @return: 
 	 */
 	drop(callback) {
-		var sql = `DROP TABLE ${this.name}`;
+		var sql = `DROP TABLE '${this.name}'`;
 		let self = this;
 		plus.sqlite.selectSql({
 			name: self.db,

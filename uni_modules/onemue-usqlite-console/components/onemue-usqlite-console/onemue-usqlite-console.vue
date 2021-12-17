@@ -1,14 +1,26 @@
 <template>
 	<view class="pages">
 		<view class="tools">
-			{{isConnect?'已连接':'未连接'}}
-			{{consoleText}}
+			<view class="tools-item">
+				{{isConnect?'已连接':'未连接'}}
+			</view>
 		</view>
 		<view class="tab-list-visual">
 			<view class="tab-list" >
 				<view class="tab-item" :class="thisTableIndex==tableIndex?'this':''" v-for="tableItem,tableIndex in tableList" :key="tableIndex" @click="changeTable(tableIndex, tableItem.name)">
 					{{tableItem.name}}
 				</view>
+				<view class="tab-item">
+					+
+				</view>
+			</view>
+		</view>
+		<view class="toolsbar">
+			<view class="tools-item" @tap="addData()">
+				增加
+			</view>
+			<view class="tools-item">
+				自定义SQL
 			</view>
 		</view>
 		<view class="table-content-visual">
@@ -70,6 +82,9 @@
 			})
 		},
 		methods:{
+			addData(){
+				this.currentTableData.push({})
+			},
 			tdTap(rows, cols, content){
 				console.log(rows, cols, content);
 				this.thiscIndex = cols;
@@ -143,6 +158,7 @@
 </script>
 <style scoped>
 	.tools{
+		display: flex;
 		position: sticky;
 		top: 0;
 		line-height: 2em;
@@ -175,6 +191,21 @@
 	}
 	.tab-list .tab-item.this{
 		background: #eee;
+	}
+	.toolsbar{
+		width: 100%;
+		border: #333 1px solid;
+		border-top: none;
+		display: flex;
+	}
+	.toolsbar .tools-item{
+		padding: 0 4px;
+		line-height: 2em;
+		border-right: #eee 1px solid;
+		white-space: nowrap;
+	}
+	.toolsbar .tools-item:last-child{
+		border-right: #eee 1px none;
 	}
 	.table-content-visual{
 		overflow: auto;

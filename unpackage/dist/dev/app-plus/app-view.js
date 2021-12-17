@@ -224,53 +224,99 @@ var render = function() {
     "v-uni-view",
     { staticClass: _vm._$g(0, "sc"), attrs: { _i: 0 } },
     [
-      _c("v-uni-view", { staticClass: _vm._$g(1, "sc"), attrs: { _i: 1 } }, [
-        _vm._v(_vm._$g(1, "t0-0") + "\n\t\t" + _vm._$g(1, "t0-1"))
-      ]),
       _c(
         "v-uni-view",
-        { staticClass: _vm._$g(2, "sc"), attrs: { _i: 2 } },
+        { staticClass: _vm._$g(1, "sc"), attrs: { _i: 1 } },
         [
           _c(
             "v-uni-view",
-            { staticClass: _vm._$g(3, "sc"), attrs: { _i: 3 } },
-            _vm._l(_vm._$g(4, "f"), function(tableItem, tableIndex, $20, $30) {
-              return _c(
-                "v-uni-view",
-                {
-                  key: tableItem,
-                  staticClass: _vm._$g("4-" + $30, "sc"),
-                  class: _vm._$g("4-" + $30, "c"),
-                  attrs: { _i: "4-" + $30 },
-                  on: {
-                    click: function($event) {
-                      return _vm.$handleViewEvent($event)
-                    }
-                  }
-                },
-                [_vm._v(_vm._$g("4-" + $30, "t0-0"))]
-              )
-            }),
-            1
+            { staticClass: _vm._$g(2, "sc"), attrs: { _i: 2 } },
+            [_vm._v(_vm._$g(2, "t0-0"))]
           )
         ],
         1
       ),
       _c(
         "v-uni-view",
-        { staticClass: _vm._$g(5, "sc"), attrs: { _i: 5 } },
+        { staticClass: _vm._$g(3, "sc"), attrs: { _i: 3 } },
+        [
+          _c(
+            "v-uni-view",
+            { staticClass: _vm._$g(4, "sc"), attrs: { _i: 4 } },
+            [
+              _vm._l(_vm._$g(5, "f"), function(
+                tableItem,
+                tableIndex,
+                $20,
+                $30
+              ) {
+                return _c(
+                  "v-uni-view",
+                  {
+                    key: tableItem,
+                    staticClass: _vm._$g("5-" + $30, "sc"),
+                    class: _vm._$g("5-" + $30, "c"),
+                    attrs: { _i: "5-" + $30 },
+                    on: {
+                      click: function($event) {
+                        return _vm.$handleViewEvent($event)
+                      }
+                    }
+                  },
+                  [_vm._v(_vm._$g("5-" + $30, "t0-0"))]
+                )
+              }),
+              _c(
+                "v-uni-view",
+                { staticClass: _vm._$g(6, "sc"), attrs: { _i: 6 } },
+                [_vm._v("+")]
+              )
+            ],
+            2
+          )
+        ],
+        1
+      ),
+      _c(
+        "v-uni-view",
+        { staticClass: _vm._$g(7, "sc"), attrs: { _i: 7 } },
+        [
+          _c(
+            "v-uni-view",
+            {
+              staticClass: _vm._$g(8, "sc"),
+              attrs: { _i: 8 },
+              on: {
+                click: function($event) {
+                  return _vm.$handleViewEvent($event)
+                }
+              }
+            },
+            [_vm._v("增加")]
+          ),
+          _c(
+            "v-uni-view",
+            { staticClass: _vm._$g(9, "sc"), attrs: { _i: 9 } },
+            [_vm._v("自定义SQL")]
+          )
+        ],
+        1
+      ),
+      _c(
+        "v-uni-view",
+        { staticClass: _vm._$g(10, "sc"), attrs: { _i: 10 } },
         [
           _c(
             "table",
-            { staticClass: _vm._$g(6, "sc"), attrs: { _i: 6 } },
+            { staticClass: _vm._$g(11, "sc"), attrs: { _i: 11 } },
             [
-              _vm._l(_vm._$g(7, "f"), function(cols, cIndex, $21, $31) {
+              _vm._l(_vm._$g(12, "f"), function(cols, cIndex, $21, $31) {
                 return _c(
                   "td",
                   {
                     key: cols,
-                    staticClass: _vm._$g("7-" + $31, "sc"),
-                    attrs: { _i: "7-" + $31 },
+                    staticClass: _vm._$g("12-" + $31, "sc"),
+                    attrs: { _i: "12-" + $31 },
                     on: {
                       click: function($event) {
                         return _vm.$handleViewEvent($event)
@@ -278,18 +324,18 @@ var render = function() {
                     }
                   },
                   [
-                    _c("v-uni-view", { attrs: { _i: "8-" + $31 } }, [
-                      _vm._v(_vm._$g("8-" + $31, "t0-0"))
+                    _c("v-uni-view", { attrs: { _i: "13-" + $31 } }, [
+                      _vm._v(_vm._$g("13-" + $31, "t0-0"))
                     ])
                   ],
                   1
                 )
               }),
-              _vm._l(_vm._$g(9, "f"), function(row, rIndex, $22, $32) {
+              _vm._l(_vm._$g(14, "f"), function(row, rIndex, $22, $32) {
                 return _c(
                   "tr",
-                  { key: row, attrs: { _i: "9-" + $32 } },
-                  _vm._l(_vm._$g(10 + "-" + $32, "f"), function(
+                  { key: row, attrs: { _i: "14-" + $32 } },
+                  _vm._l(_vm._$g(15 + "-" + $32, "f"), function(
                     cols,
                     cIndex,
                     $23,
@@ -299,8 +345,8 @@ var render = function() {
                       "td",
                       {
                         key: cols,
-                        class: _vm._$g("10-" + $32 + "-" + $33, "c"),
-                        attrs: { _i: "10-" + $32 + "-" + $33 },
+                        class: _vm._$g("15-" + $32 + "-" + $33, "c"),
+                        attrs: { _i: "15-" + $32 + "-" + $33 },
                         on: {
                           click: function($event) {
                             return _vm.$handleViewEvent($event)
@@ -311,23 +357,23 @@ var render = function() {
                         _c(
                           "v-uni-view",
                           {
-                            staticClass: _vm._$g("11-" + $32 + "-" + $33, "sc"),
-                            attrs: { _i: "11-" + $32 + "-" + $33 }
+                            staticClass: _vm._$g("16-" + $32 + "-" + $33, "sc"),
+                            attrs: { _i: "16-" + $32 + "-" + $33 }
                           },
                           [
                             _c(
                               "v-uni-view",
                               {
-                                class: _vm._$g("12-" + $32 + "-" + $33, "c"),
-                                attrs: { _i: "12-" + $32 + "-" + $33 }
+                                class: _vm._$g("17-" + $32 + "-" + $33, "c"),
+                                attrs: { _i: "17-" + $32 + "-" + $33 }
                               },
-                              [_vm._v(_vm._$g("12-" + $32 + "-" + $33, "t0-0"))]
+                              [_vm._v(_vm._$g("17-" + $32 + "-" + $33, "t0-0"))]
                             ),
                             _c("v-uni-input", {
-                              class: _vm._$g("13-" + $32 + "-" + $33, "c"),
+                              class: _vm._$g("18-" + $32 + "-" + $33, "c"),
                               attrs: {
                                 type: "text",
-                                _i: "13-" + $32 + "-" + $33
+                                _i: "18-" + $32 + "-" + $33
                               },
                               on: {
                                 blur: function($event) {
@@ -336,12 +382,12 @@ var render = function() {
                               },
                               model: {
                                 value: _vm._$g(
-                                  "13-" + $32 + "-" + $33,
+                                  "18-" + $32 + "-" + $33,
                                   "v-model"
                                 ),
                                 callback: function($$v) {
                                   _vm.$handleVModelEvent(
-                                    "13-" + $32 + "-" + $33,
+                                    "18-" + $32 + "-" + $33,
                                     $$v
                                   )
                                 },
@@ -456,7 +502,7 @@ if(false) {}
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../../../../../../../../Applications/HBuilderX 2.app/Contents/HBuilderX/plugins/uniapp-cli/node_modules/css-loader/dist/runtime/api.js */ 10);
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
-exports.push([module.i, "\n.tools[data-v-7a30f62b]{\n\tposition: -webkit-sticky;\n\tposition: sticky;\n\ttop: 0;\n\tline-height: 2em;\n\theight: 2em;\n\tbackground: #FFFFFF;\n}\n.tab-list-visual[data-v-7a30f62b]{\n\tposition: -webkit-sticky;\n\tposition: sticky;\n\ttop: 2em;\n\tline-height: 2em;\n\theight: 2em;\n\tbackground: #FFFFFF;\n}\n.tab-list-visual[data-v-7a30f62b]{\n\toverflow: auto;\n\tborder: #333333 1px solid;\n\tborder-width: 1px 0  1px 0;\n}\n.tab-list[data-v-7a30f62b]{\n\tdisplay: flex;\n}\n.tab-list .tab-item[data-v-7a30f62b]{\n\tpadding: 0 4px;\n\tline-height: 2em;\n\tborder-right: #eee 1px solid;\n\twhite-space: nowrap;\n}\n.tab-list .tab-item[data-v-7a30f62b]:last-child{\n\tborder-right: #eee 1px none;\n}\n.tab-list .tab-item.this[data-v-7a30f62b]{\n\tbackground: #eee;\n}\n.table-content-visual[data-v-7a30f62b]{\n\toverflow: auto;\n}\n.table-content[data-v-7a30f62b] {border-collapse:collapse;}\n.table-content td.content[data-v-7a30f62b],\n.table-content td.header[data-v-7a30f62b]{\n\tpadding: 2px;\n\tborder: #eee 1px solid;\n\tmargin: 0;\n\twhite-space: nowrap;\n}\n.table-content td.content[data-v-7a30f62b]:hover{\n\tbackground: #eee;\n}\n.data .show[data-v-7a30f62b]{\n\tdisplay: block;\n}\n.data .hied[data-v-7a30f62b]{\n\tdisplay: none;\n}\n", ""]);
+exports.push([module.i, "\n.tools[data-v-7a30f62b]{\n\tdisplay: flex;\n\tposition: -webkit-sticky;\n\tposition: sticky;\n\ttop: 0;\n\tline-height: 2em;\n\theight: 2em;\n\tbackground: #FFFFFF;\n}\n.tab-list-visual[data-v-7a30f62b]{\n\tposition: -webkit-sticky;\n\tposition: sticky;\n\ttop: 2em;\n\tline-height: 2em;\n\theight: 2em;\n\tbackground: #FFFFFF;\n}\n.tab-list-visual[data-v-7a30f62b]{\n\toverflow: auto;\n\tborder: #333333 1px solid;\n\tborder-width: 1px 0  1px 0;\n}\n.tab-list[data-v-7a30f62b]{\n\tdisplay: flex;\n}\n.tab-list .tab-item[data-v-7a30f62b]{\n\tpadding: 0 4px;\n\tline-height: 2em;\n\tborder-right: #eee 1px solid;\n\twhite-space: nowrap;\n}\n.tab-list .tab-item[data-v-7a30f62b]:last-child{\n\tborder-right: #eee 1px none;\n}\n.tab-list .tab-item.this[data-v-7a30f62b]{\n\tbackground: #eee;\n}\n.toolsbar[data-v-7a30f62b]{\n\twidth: 100%;\n\tborder: #333 1px solid;\n\tborder-top: none;\n\tdisplay: flex;\n}\n.toolsbar .tools-item[data-v-7a30f62b]{\n\tpadding: 0 4px;\n\tline-height: 2em;\n\tborder-right: #eee 1px solid;\n\twhite-space: nowrap;\n}\n.toolsbar .tools-item[data-v-7a30f62b]:last-child{\n\tborder-right: #eee 1px none;\n}\n.table-content-visual[data-v-7a30f62b]{\n\toverflow: auto;\n}\n.table-content[data-v-7a30f62b] {border-collapse:collapse;}\n.table-content td.content[data-v-7a30f62b],\n.table-content td.header[data-v-7a30f62b]{\n\tpadding: 2px;\n\tborder: #eee 1px solid;\n\tmargin: 0;\n\twhite-space: nowrap;\n}\n.table-content td.content[data-v-7a30f62b]:hover{\n\tbackground: #eee;\n}\n.data .show[data-v-7a30f62b]{\n\tdisplay: block;\n}\n.data .hied[data-v-7a30f62b]{\n\tdisplay: none;\n}\n", ""]);
 // Exports
 module.exports = exports;
 
@@ -1269,53 +1315,99 @@ var render = function() {
     "v-uni-view",
     { staticClass: _vm._$g(0, "sc"), attrs: { _i: 0 } },
     [
-      _c("v-uni-view", { staticClass: _vm._$g(1, "sc"), attrs: { _i: 1 } }, [
-        _vm._v(_vm._$g(1, "t0-0") + "\n\t\t" + _vm._$g(1, "t0-1"))
-      ]),
       _c(
         "v-uni-view",
-        { staticClass: _vm._$g(2, "sc"), attrs: { _i: 2 } },
+        { staticClass: _vm._$g(1, "sc"), attrs: { _i: 1 } },
         [
           _c(
             "v-uni-view",
-            { staticClass: _vm._$g(3, "sc"), attrs: { _i: 3 } },
-            _vm._l(_vm._$g(4, "f"), function(tableItem, tableIndex, $20, $30) {
-              return _c(
-                "v-uni-view",
-                {
-                  key: tableItem,
-                  staticClass: _vm._$g("4-" + $30, "sc"),
-                  class: _vm._$g("4-" + $30, "c"),
-                  attrs: { _i: "4-" + $30 },
-                  on: {
-                    click: function($event) {
-                      return _vm.$handleViewEvent($event)
-                    }
-                  }
-                },
-                [_vm._v(_vm._$g("4-" + $30, "t0-0"))]
-              )
-            }),
-            1
+            { staticClass: _vm._$g(2, "sc"), attrs: { _i: 2 } },
+            [_vm._v(_vm._$g(2, "t0-0"))]
           )
         ],
         1
       ),
       _c(
         "v-uni-view",
-        { staticClass: _vm._$g(5, "sc"), attrs: { _i: 5 } },
+        { staticClass: _vm._$g(3, "sc"), attrs: { _i: 3 } },
+        [
+          _c(
+            "v-uni-view",
+            { staticClass: _vm._$g(4, "sc"), attrs: { _i: 4 } },
+            [
+              _vm._l(_vm._$g(5, "f"), function(
+                tableItem,
+                tableIndex,
+                $20,
+                $30
+              ) {
+                return _c(
+                  "v-uni-view",
+                  {
+                    key: tableItem,
+                    staticClass: _vm._$g("5-" + $30, "sc"),
+                    class: _vm._$g("5-" + $30, "c"),
+                    attrs: { _i: "5-" + $30 },
+                    on: {
+                      click: function($event) {
+                        return _vm.$handleViewEvent($event)
+                      }
+                    }
+                  },
+                  [_vm._v(_vm._$g("5-" + $30, "t0-0"))]
+                )
+              }),
+              _c(
+                "v-uni-view",
+                { staticClass: _vm._$g(6, "sc"), attrs: { _i: 6 } },
+                [_vm._v("+")]
+              )
+            ],
+            2
+          )
+        ],
+        1
+      ),
+      _c(
+        "v-uni-view",
+        { staticClass: _vm._$g(7, "sc"), attrs: { _i: 7 } },
+        [
+          _c(
+            "v-uni-view",
+            {
+              staticClass: _vm._$g(8, "sc"),
+              attrs: { _i: 8 },
+              on: {
+                click: function($event) {
+                  return _vm.$handleViewEvent($event)
+                }
+              }
+            },
+            [_vm._v("增加")]
+          ),
+          _c(
+            "v-uni-view",
+            { staticClass: _vm._$g(9, "sc"), attrs: { _i: 9 } },
+            [_vm._v("自定义SQL")]
+          )
+        ],
+        1
+      ),
+      _c(
+        "v-uni-view",
+        { staticClass: _vm._$g(10, "sc"), attrs: { _i: 10 } },
         [
           _c(
             "table",
-            { staticClass: _vm._$g(6, "sc"), attrs: { _i: 6 } },
+            { staticClass: _vm._$g(11, "sc"), attrs: { _i: 11 } },
             [
-              _vm._l(_vm._$g(7, "f"), function(cols, cIndex, $21, $31) {
+              _vm._l(_vm._$g(12, "f"), function(cols, cIndex, $21, $31) {
                 return _c(
                   "td",
                   {
                     key: cols,
-                    staticClass: _vm._$g("7-" + $31, "sc"),
-                    attrs: { _i: "7-" + $31 },
+                    staticClass: _vm._$g("12-" + $31, "sc"),
+                    attrs: { _i: "12-" + $31 },
                     on: {
                       click: function($event) {
                         return _vm.$handleViewEvent($event)
@@ -1323,18 +1415,18 @@ var render = function() {
                     }
                   },
                   [
-                    _c("v-uni-view", { attrs: { _i: "8-" + $31 } }, [
-                      _vm._v(_vm._$g("8-" + $31, "t0-0"))
+                    _c("v-uni-view", { attrs: { _i: "13-" + $31 } }, [
+                      _vm._v(_vm._$g("13-" + $31, "t0-0"))
                     ])
                   ],
                   1
                 )
               }),
-              _vm._l(_vm._$g(9, "f"), function(row, rIndex, $22, $32) {
+              _vm._l(_vm._$g(14, "f"), function(row, rIndex, $22, $32) {
                 return _c(
                   "tr",
-                  { key: row, attrs: { _i: "9-" + $32 } },
-                  _vm._l(_vm._$g(10 + "-" + $32, "f"), function(
+                  { key: row, attrs: { _i: "14-" + $32 } },
+                  _vm._l(_vm._$g(15 + "-" + $32, "f"), function(
                     cols,
                     cIndex,
                     $23,
@@ -1344,8 +1436,8 @@ var render = function() {
                       "td",
                       {
                         key: cols,
-                        class: _vm._$g("10-" + $32 + "-" + $33, "c"),
-                        attrs: { _i: "10-" + $32 + "-" + $33 },
+                        class: _vm._$g("15-" + $32 + "-" + $33, "c"),
+                        attrs: { _i: "15-" + $32 + "-" + $33 },
                         on: {
                           click: function($event) {
                             return _vm.$handleViewEvent($event)
@@ -1356,23 +1448,23 @@ var render = function() {
                         _c(
                           "v-uni-view",
                           {
-                            staticClass: _vm._$g("11-" + $32 + "-" + $33, "sc"),
-                            attrs: { _i: "11-" + $32 + "-" + $33 }
+                            staticClass: _vm._$g("16-" + $32 + "-" + $33, "sc"),
+                            attrs: { _i: "16-" + $32 + "-" + $33 }
                           },
                           [
                             _c(
                               "v-uni-view",
                               {
-                                class: _vm._$g("12-" + $32 + "-" + $33, "c"),
-                                attrs: { _i: "12-" + $32 + "-" + $33 }
+                                class: _vm._$g("17-" + $32 + "-" + $33, "c"),
+                                attrs: { _i: "17-" + $32 + "-" + $33 }
                               },
-                              [_vm._v(_vm._$g("12-" + $32 + "-" + $33, "t0-0"))]
+                              [_vm._v(_vm._$g("17-" + $32 + "-" + $33, "t0-0"))]
                             ),
                             _c("v-uni-input", {
-                              class: _vm._$g("13-" + $32 + "-" + $33, "c"),
+                              class: _vm._$g("18-" + $32 + "-" + $33, "c"),
                               attrs: {
                                 type: "text",
-                                _i: "13-" + $32 + "-" + $33
+                                _i: "18-" + $32 + "-" + $33
                               },
                               on: {
                                 blur: function($event) {
@@ -1381,12 +1473,12 @@ var render = function() {
                               },
                               model: {
                                 value: _vm._$g(
-                                  "13-" + $32 + "-" + $33,
+                                  "18-" + $32 + "-" + $33,
                                   "v-model"
                                 ),
                                 callback: function($$v) {
                                   _vm.$handleVModelEvent(
-                                    "13-" + $32 + "-" + $33,
+                                    "18-" + $32 + "-" + $33,
                                     $$v
                                   )
                                 },
@@ -1501,7 +1593,7 @@ if(false) {}
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../../../../../../../../Applications/HBuilderX 2.app/Contents/HBuilderX/plugins/uniapp-cli/node_modules/css-loader/dist/runtime/api.js */ 10);
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
-exports.push([module.i, "\n.tools[data-v-52dbd95b]{\n\tposition: -webkit-sticky;\n\tposition: sticky;\n\ttop: 0;\n\tline-height: 2em;\n\theight: 2em;\n\tbackground: #FFFFFF;\n}\n.tab-list-visual[data-v-52dbd95b]{\n\tposition: -webkit-sticky;\n\tposition: sticky;\n\ttop: 2em;\n\tline-height: 2em;\n\theight: 2em;\n\tbackground: #FFFFFF;\n}\n.tab-list-visual[data-v-52dbd95b]{\n\toverflow: auto;\n\tborder: #333333 1px solid;\n\tborder-width: 1px 0  1px 0;\n}\n.tab-list[data-v-52dbd95b]{\n\tdisplay: flex;\n}\n.tab-list .tab-item[data-v-52dbd95b]{\n\tpadding: 0 4px;\n\tline-height: 2em;\n\tborder-right: #eee 1px solid;\n\twhite-space: nowrap;\n}\n.tab-list .tab-item[data-v-52dbd95b]:last-child{\n\tborder-right: #eee 1px none;\n}\n.tab-list .tab-item.this[data-v-52dbd95b]{\n\tbackground: #eee;\n}\n.table-content-visual[data-v-52dbd95b]{\n\toverflow: auto;\n}\n.table-content[data-v-52dbd95b] {border-collapse:collapse;}\n.table-content td.content[data-v-52dbd95b],\n.table-content td.header[data-v-52dbd95b]{\n\tpadding: 2px;\n\tborder: #eee 1px solid;\n\tmargin: 0;\n\twhite-space: nowrap;\n}\n.table-content td.content[data-v-52dbd95b]:hover{\n\tbackground: #eee;\n}\n.data .show[data-v-52dbd95b]{\n\tdisplay: block;\n}\n.data .hied[data-v-52dbd95b]{\n\tdisplay: none;\n}\n", ""]);
+exports.push([module.i, "\n.tools[data-v-52dbd95b]{\n\tdisplay: flex;\n\tposition: -webkit-sticky;\n\tposition: sticky;\n\ttop: 0;\n\tline-height: 2em;\n\theight: 2em;\n\tbackground: #FFFFFF;\n}\n.tab-list-visual[data-v-52dbd95b]{\n\tposition: -webkit-sticky;\n\tposition: sticky;\n\ttop: 2em;\n\tline-height: 2em;\n\theight: 2em;\n\tbackground: #FFFFFF;\n}\n.tab-list-visual[data-v-52dbd95b]{\n\toverflow: auto;\n\tborder: #333333 1px solid;\n\tborder-width: 1px 0  1px 0;\n}\n.tab-list[data-v-52dbd95b]{\n\tdisplay: flex;\n}\n.tab-list .tab-item[data-v-52dbd95b]{\n\tpadding: 0 4px;\n\tline-height: 2em;\n\tborder-right: #eee 1px solid;\n\twhite-space: nowrap;\n}\n.tab-list .tab-item[data-v-52dbd95b]:last-child{\n\tborder-right: #eee 1px none;\n}\n.tab-list .tab-item.this[data-v-52dbd95b]{\n\tbackground: #eee;\n}\n.toolsbar[data-v-52dbd95b]{\n\twidth: 100%;\n\tborder: #333 1px solid;\n\tborder-top: none;\n\tdisplay: flex;\n}\n.toolsbar .tools-item[data-v-52dbd95b]{\n\tpadding: 0 4px;\n\tline-height: 2em;\n\tborder-right: #eee 1px solid;\n\twhite-space: nowrap;\n}\n.toolsbar .tools-item[data-v-52dbd95b]:last-child{\n\tborder-right: #eee 1px none;\n}\n.table-content-visual[data-v-52dbd95b]{\n\toverflow: auto;\n}\n.table-content[data-v-52dbd95b] {border-collapse:collapse;}\n.table-content td.content[data-v-52dbd95b],\n.table-content td.header[data-v-52dbd95b]{\n\tpadding: 2px;\n\tborder: #eee 1px solid;\n\tmargin: 0;\n\twhite-space: nowrap;\n}\n.table-content td.content[data-v-52dbd95b]:hover{\n\tbackground: #eee;\n}\n.data .show[data-v-52dbd95b]{\n\tdisplay: block;\n}\n.data .hied[data-v-52dbd95b]{\n\tdisplay: none;\n}\n", ""]);
 // Exports
 module.exports = exports;
 

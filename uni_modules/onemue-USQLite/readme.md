@@ -152,7 +152,6 @@ studentModel.create((err,results)=>{
     console.log(results);
 });
 ```
-
 #### 1.7-数据库是否存在Model对应的数据表(慎用)
 ```js
 studentModel.isExist((err,results)=>{
@@ -171,3 +170,32 @@ studentModel.insert({name:'张三22',age:22},(err,results)=>{
     console.log(results);
 });
 ```
+
+### JS类型转存SQLite时如何处理
+> 参考：
+> [sqliet数据类型](https://www.runoob.com/sqlite/sqlite-data-types.html)
+总结来说就是大部分都转化成了TEXT格式进行存储。
+```js
+if (option[key] == Number) {
+	str += `'${key}' numeric,`;
+} else if (option[key] == Date) {
+	str += `'${key}' timestamp,`;
+} else {
+	str += `'${key}' varchar,`;
+}
+```
+**Number**
+usqlite 会将`Number`数据类型转换`numeric`,但是sqlite会根据数据是否可逆，转化为`INTEGER`(带符号的整数)或者`REAL`(8 字节的 IEEE 浮点数).
+**其他内容**
+usqlite 会将其他数据类型转化`varchar`，sqlite会将其转化为`TEXT`。
+### Q&A
+1. db 文件存放在什么位置？
+> 答： 如果是`_doc`的话存放存放位置参考[H5+ Api - PRIVATE_DOC](https://www.html5plus.org/doc/zh_cn/io.html#plus.io.PRIVATE_DOC)。
+> 如果是其他路径，请参考[H5+ Api - SQLite](https://www.html5plus.org/doc/zh_cn/sqlite.html#openDatabase)。
+
+2. 后续更新其他api会不会不兼容当然版本？
+> 答： 在后续版本中，始终会兼容当前版本。
+
+3. 为什么兼容性这么差，只兼容APP版本吗？后续会不会兼容其他版本？
+> 答： 由于**H5+ plus API**限制，当前版本只支持APP，后续版本会兼容其他内容，但是兼容其他版本就不能使用Sqlite，而是使用其他`Storage`或者其他内容进行兼容处理部分api将不支持，特别是自定sql的api。
+> 并且这个这些功能会在后期在开发，可能要到年后或者什么时候，我近期开发Sqlite的App可视化插件。
