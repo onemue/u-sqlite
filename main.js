@@ -1,5 +1,11 @@
 import App from './App'
+import { usqlite } from '@/uni_modules/onemue-USQLite/js_sdk/usqlite.js'
+uni.$sql = usqlite;
 
+Vue.prototype.dbOptions = {
+	name: 'demo',
+	path: '_doc/demo.db'
+}
 // #ifndef VUE3
 import Vue from 'vue'
 Vue.config.productionTip = false
