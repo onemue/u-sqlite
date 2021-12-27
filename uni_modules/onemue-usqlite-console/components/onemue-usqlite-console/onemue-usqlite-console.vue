@@ -1,7 +1,7 @@
 <template>
 	<view class="pages">
 		<view class="tools">
-			<view class="tools-item">
+			<view class="tools-item" @tap="init()">
 				{{isConnect?'已连接':'未连接'}}
 			</view>
 		</view>
@@ -64,7 +64,10 @@
 		onShow() {
 			let self = this;
 			self.consoleText = usqlite;
-			usqlite.connect(this.dbOptions, function(e, r){
+		},
+		methods:{
+			init(){
+				usqlite.connect(this.dbOptions, function(e, r){
 				if(e){
 					if(e.code == -1402){
 						self.isConnect = true;
@@ -80,8 +83,7 @@
 				self.isConnect = true;
 				console.log('链接成功');
 			})
-		},
-		methods:{
+			},
 			addData(){
 				this.currentTableData.push({})
 			},
@@ -150,7 +152,9 @@
 						console.log(err);
 						return;
 					}
+					
 					self.currentTableData = r;
+					console.log(self.currentTableData);
 				})
 			}
 		}
