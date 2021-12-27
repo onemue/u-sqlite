@@ -6,6 +6,10 @@
  * by: onemue
  */
 
+// 我们考虑在数据中存放一些例如：社区APP 存放一些帖子信息等等内容，实现断网信息保留等功能。
+// 参考 mysql-ithm
+// URL: https://github.com/kxzkane/mysql-ithm/blob/master/index.js
+// CREATE TABLE <表名> ([表定义选项])[表选项][分区选项];
 //数据库配置
 let options = {};
 let tableSQL = '';
@@ -18,6 +22,7 @@ class Model {
 		this.option = option;
 		this.db = db;
 		let self = this;
+
 		self.isExist(function(e, r){
 			if (!r) {
 				self.create();
@@ -32,7 +37,7 @@ class Model {
 	find(options, callback) {
 		var sql = '';
 		let self = this;
-		self.repair();
+
 		if (!callback) {
 			sql = `SELECT * FROM '${this.name}'`;
 			callback = options;
@@ -51,7 +56,6 @@ class Model {
 				callback(e);
 			}
 		})
-		console.log(sql)
 		return this;
 	}
 	/**
@@ -62,7 +66,6 @@ class Model {
 	limit(options, callback) {
 		var sql = '';
 		let self = this;
-		self.repair();
 		if (!options.where) {
 			sql = `SELECT * FROM '${this.name}' LIMIT ${options.count} OFFSET ${(options.number - 1) * options.count}`
 		} else {
@@ -88,7 +91,6 @@ class Model {
 	 */
 	insert(obj, callback) {
 		let self = this;
-		self.repair();
 		if (!true) {
 			// todo
 		} else {
@@ -107,7 +109,6 @@ class Model {
 		let keys = [];
 		let values = '';
 		let self = this;
-		self.repair();
 		for (var key in obj) {
 			keys.push(key);
 			values += `'${obj[key]}',`;
@@ -136,7 +137,6 @@ class Model {
 	update(option, obj, callback) {
 		let sql = '';
 		let self = this;
-		self.repair();
 		if (arguments.length == 2) {
 			callback = obj;
 			obj = option;
@@ -173,7 +173,6 @@ class Model {
 	delete(option, callback) {
 		var sql = '';
 		let self = this;
-		self.repair();
 		if (!callback) {
 			sql = `DELETE FROM '${this.name}'`;
 			callback = option;
@@ -193,110 +192,12 @@ class Model {
 		return this;
 	}
 	/**
-	 * @description:  重命名或者新增列
-	 * @param {Object} option：参数 数组为新增多列 对象为新增单列{aa} 字符串重命名
-	 * @param {Function} callback :（err,results）=>{}
-	 * @return: 
-	 */
-	alter(option, callback) {
-		let self = this;
-		let sql = '';
-		if(option.constructor == Array){		// 新增多列
-			for (let i = 0; i < option.length; i++) {
-				self.alter(option[i], callback);
-			}
-		}
-		else if(option.constructor == Object){	// 新增单列
-			let column = '';
-			if (option.option == Number) {
-				column += `'${option.name}' numeric,`;
-			} else if (option.option == Date) {
-				column += `'${option.name}' timestamp,`;
-			} else if (Object.prototype.toString.call(option.option) === '[object Object]') {
-				const THIS_VALUE = option.option;
-				let cols = [];
-				if (THIS_VALUE.type == Number) {
-					console.log(`'${option.name}' numeric`);
-					cols.push(`'${option.name}' numeric`);
-				} else if (THIS_VALUE.type == Date) {
-					console.log(`'${option.name}' timestamp`);
-					cols.push(`'${option.name}' timestamp`);
-				} else {
-					console.log(`'${option.name}' varchar`);
-					cols.push(`'${option.name}' varchar`);
-				}
-			
-				// 是否允许为空
-				if(THIS_VALUE.notNull==true){
-					console.log(` NOT NULL`);
-
-					cols.push(' NOT NULL');
-				}
-			
-				// 默认值
-				if(THIS_VALUE.default){
-					console.log(` DEFAULT ${THIS_VALUE.default}`);
-			
-					cols.push(` DEFAULT ${THIS_VALUE.default}`);
-				}
-			
-				// 是否是不同的值
-				if(THIS_VALUE.unique ==true){
-					console.log(` UNIQUE`);
-			
-					cols.push(' UNIQUE');
-				}
-			
-				// 主键
-				if(THIS_VALUE.primaryKey==true){
-					console.log(` PRIMARY KEY`);
-			
-					cols.push(' PRIMARY KEY');
-				}
-			
-				// 检查
-				if(THIS_VALUE.check){
-					console.log(` CHECK(${THIS_VALUE.check})`);
-			
-					cols.push(` CHECK(${THIS_VALUE.check})`);
-				}
-				cols.push(',');
-				console.log(sqls.join(''));
-			
-				column += sqls.join('');
-			} else {
-				column += `'${option.name}' varchar,`;
-			}
-			column = column.replace(/,$/, '');
-			sql = `ALTER TABLE '${this.name}' ADD COLUMN ${column}`
-		}
-		else if(option.constructor == String){	// 重命名
-			sql = `ALTER TABLE '${self.name}' RENAME TO '${option}'`
-		}
-		
-		plus.sqlite.selectSql({
-			name: self.db,
-			sql: sql,
-			success(e) {
-				if(option.constructor == String){	// 重命名
-					self.name = option;
-				}
-				callback(null, e);
-			},
-			fail(e) {
-				callback(e);
-			}
-		});
-		return this;
-	}
-	/**
 	 * @description: 执行sql语句
 	 * @param {String} sql : sql语句
 	 * @param {Function} callback :（err,results）=>{}
 	 */
 	sql(sql, callback) {
 		let self = this;
-		self.repair();
 		plus.sqlite.selectSql({
 			name: self.db,
 			sql: sql,
@@ -329,7 +230,6 @@ class Model {
 		});
 		return this;
 	}
-
 	connect(callback) {
 		let sql = `SELETE count(*) AS isTable FROM sqlite_master WHERE type='table' AND name='${this.name}'`;
 		let self = this;
@@ -345,10 +245,6 @@ class Model {
 		});
 		return this;
 	}
-	/**
-	 * 判断是否存在
-	 * @param {Object} callback 
-	 */
 	isExist(callback) {
 		let self = this;
 		// return new Promise((resolve, reject) => {
@@ -381,15 +277,6 @@ class Model {
 			}
 		})
 		return this;
-	}
-	
-	repair(){
-		let self = this;
-		self.isExist(function(e, r){
-			if (!r) {
-				self.create();
-			}
-		})
 	}
 }
 
@@ -455,77 +342,17 @@ usqlite = {
 	 * @param {Object} option
 	 */
 	modelSql(name, option) {
-		let isHasPRIMARY_Key = false; 
-		let str = ''; // usql_id 为自增主键
+		let str = '`usql_id` integer PRIMARY KEY,'; // usql_id 为自增主键
 		for (var key in option) {
 			if (option[key] == Number) {
 				str += `'${key}' numeric,`;
 			} else if (option[key] == Date) {
 				str += `'${key}' timestamp,`;
-			} else if (Object.prototype.toString.call(option[key]) === '[object Object]') {
-				const THIS_VALUE = option[key];
-				let sqls = [];
-				// THIS_VALUE.type = getSqlType();
-				if (THIS_VALUE.type == Number) {
-					console.log(`'${key}' numeric`);
-					sqls.push(`'${key}' numeric`);
-				} else if (THIS_VALUE.type == Date) {
-					console.log(`'${key}' timestamp`);
-					sqls.push(`'${key}' timestamp`);
-				} else {
-					console.log(`'${key}' varchar`);
-					sqls.push(`'${key}' varchar`);
-				}
-
-				// 是否允许为空
-				if(THIS_VALUE.notNull==true){
-					console.log(` NOT NULL`);
-
-					sqls.push(' NOT NULL');
-				}
-
-				// 默认值
-				if(THIS_VALUE.default){
-					console.log(` DEFAULT ${THIS_VALUE.default}`);
-
-					sqls.push(` DEFAULT ${THIS_VALUE.default}`);
-				}
-
-				// 是否是不同的值
-				if(THIS_VALUE.unique ==true){
-					console.log(` UNIQUE`);
-
-					sqls.push(' UNIQUE');
-				}
-
-				// 主键
-				if(THIS_VALUE.primaryKey==true){
-					isHasPRIMARY_Key = true;
-					console.log(` PRIMARY KEY`);
-
-					sqls.push(' PRIMARY KEY');
-				}
-
-				// 检查
-				if(THIS_VALUE.check){
-					console.log(` CHECK(${THIS_VALUE.check})`);
-
-					sqls.push(` CHECK(${THIS_VALUE.check})`);
-				}
-				sqls.push(',');
-				console.log(sqls.join(''));
-
-				str+= sqls.join('');
 			} else {
 				str += `'${key}' varchar,`;
 			}
 		};
-		// 如果没有主键 就添加主键
-		// if (!isHasPRIMARY_Key) {
-		// 	str = '`usql_id` integer PRIMARY KEY,'+str; // usql_id 为自增主键
-		// }
 		str = str.replace(/,$/, '');
-		console.log(`CREATE TABLE '${name}' (${str})`);
 		return `CREATE TABLE '${name}' (${str})`;
 	}
 }
