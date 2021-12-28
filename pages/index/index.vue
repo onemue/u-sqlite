@@ -89,7 +89,7 @@
 			},
 			createModel: function() {
 				this.sqlModel = uni.$sql.model(
-					'sqlModel6', {
+					'sqlModel7', {
 						id: {
 							primaryKey: true,
 							type: String

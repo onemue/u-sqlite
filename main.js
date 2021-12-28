@@ -1,5 +1,7 @@
 import App from './App'
-import { usqlite } from '@/uni_modules/onemue-USQLite/js_sdk/usqlite.js'
+// import { usqlite } from '@/uni_modules/onemue-USQLite/js_sdk/usqlite.js'
+import { usqlite } from '@/uni_modules/onemue-USQLite/js_sdk/usqlite_v2.js' // 挂载 v2 版本
+
 uni.$sql = usqlite;
 
 Vue.prototype.dbOptions = {
