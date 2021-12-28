@@ -132,7 +132,7 @@ studentModel.join(	// 左表
 	{
 		where: 'grade<60',	// 筛选条件
 		type: 'inner',		// 链接模式
-		predicate: {		// 谓语 匹配词语
+		predicate: {		// 谓语匹配词语
 			left: 'id',
 			right: 'id'
 		}
