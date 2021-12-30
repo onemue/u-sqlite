@@ -7,7 +7,7 @@
  */
 
 let config = {
-	deBug: true,
+	deBug: false,
 	isConnect: false
 }
 class Response {
