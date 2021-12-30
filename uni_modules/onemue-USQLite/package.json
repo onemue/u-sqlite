@@ -6,7 +6,7 @@
   "keywords": [
     "USQLite,数据库操作,缓存,大数据缓存,sqlite,sql,orm"
 ],
-  "repository": "https://github.com/onemue/u-sqlite",
+  "repository": "https://codechina.csdn.net/qq_41986908/USQLite",
   "engines": {
     "HBuilderX": "^3.1.0"
   },

@@ -116,6 +116,7 @@
 						B_b: Boolean
 					}
 				);
+				// console.log(this.sqlModel);
 			},
 			isModel: function() {
 				// console.log('e, r');
@@ -297,6 +298,7 @@
 		background: #eee;
 		border-width: 0;
 		margin-top: 4px;
+
 	}
 
 	.usql-console {
