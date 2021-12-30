@@ -13,7 +13,7 @@
 				</button>
 			</view>
 		</view>
-<!-- 		<view class="usql-console">
+		<!-- 		<view class="usql-console">
 			<usql-console>aaa</usql-console>
 		</view> -->
 	</view>
@@ -40,12 +40,13 @@
 					},
 					{
 						name: "版本",
-						describe: "v 0.0.0",
+						describe: "v 2.0.0",
 					},
 					{
 						name: "SQLite",
-						describe: "SQLite 封装的方法",
+						describe: "SQLite 封装的方法，更加完善的调用方法",
 						function: {
+							"打开demo": this.openNote,
 							"链接数据库": this.connectDatabase,
 							"检测是否链接数据库": this.isConnect,
 							"创建Model": this.createModel,
@@ -75,6 +76,18 @@
 
 		},
 		methods: {
+			openNote: function() {
+				console.log("open note");
+				uni.redirectTo({
+					url: '../home/home',
+					success: function(){
+	
+					},
+					fail(e) {
+						console.log(e)
+					}
+				})
+			},
 			connectDatabase: function() {
 				uni.$sql.connect(this.sqlOptions, function(err, results) {
 					if (err) {
@@ -209,10 +222,9 @@
 						console.log('P2:  ' + e, r);
 					})
 			},
-			alterAddCols: function(){
+			alterAddCols: function() {
 				this.sqlModel
-					.alter([
-						{
+					.alter([{
 							name: 'newCol1',
 							option: String
 						},
@@ -224,23 +236,23 @@
 							name: 'newCol3',
 							option: String
 						}
-					], function(e,r){
-							console.log(e, r);
+					], function(e, r) {
+						console.log(e, r);
 					})
 			},
-			alterAddCol: function(){
+			alterAddCol: function() {
 				this.sqlModel
 					.alter({
 						name: 'newCol',
 						option: String
-					}, function(e,r){
-							console.log(e, r);
+					}, function(e, r) {
+						console.log(e, r);
 					})
 			},
-			alter: function(){
+			alter: function() {
 				this.sqlModel
-					.alter('demo', function(e,r){
-							console.log(e, r);
+					.alter('demo', function(e, r) {
+						console.log(e, r);
 					})
 			},
 			console: function() {
@@ -286,9 +298,10 @@
 		border-width: 0;
 		margin-top: 4px;
 	}
-	.usql-console{
+
+	.usql-console {
 		position: fixed;
-		width: 80vw; 
+		width: 80vw;
 		height: 80vh;
 		top: 0px;
 		left: 10vw;

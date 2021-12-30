@@ -2,6 +2,7 @@
 
 > u-SQLite 交流群：643867519
 > 如果觉的当前插件对你有帮助可以前往 [github](https://github.com/onemue/u-sqlite) 点 star!
+
 ### 技术亮点
 1. 基于ORM技术，使用对象的方式来操作sqlite数据库，而无需编写任何sql语句
 2. 支持数据库的常规操作增删改查，API极为简洁，且高效智能。
