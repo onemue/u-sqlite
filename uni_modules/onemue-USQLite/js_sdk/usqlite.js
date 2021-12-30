@@ -1,53 +1,148 @@
 /**
- * 处理SQLite SQLite 是 APP 才有的内容 所以 需要同一套API 满足 setStorage 的API
- * 方便多平台开发
- * time：2021-12-16 16:30:00
- * version：1.0.0
- * by: onemue
+ * 对 SQLite 的 ORM 的封装处理
+ * @time 2021-12-30 11:00:00
+ * @version 2.0.0
+ * 
+ * @by onemue
  */
 
-// 我们考虑在数据中存放一些例如：社区APP 存放一些帖子信息等等内容，实现断网信息保留等功能。
-// 参考 mysql-ithm
-// URL: https://github.com/kxzkane/mysql-ithm/blob/master/index.js
-// CREATE TABLE <表名> ([表定义选项])[表选项][分区选项];
-//数据库配置
-let options = {};
-let tableSQL = '';
-let databaseName = '';
-let isConnect = false;
-
-class Model {
-	constructor(name, option, db) {
-		this.name = name;
-		this.option = option;
-		this.db = db;
-		let self = this;
-
-		self.isExist(function(e, r){
-			if (!r) {
-				self.create();
-			}
-		})
+let config = {
+	deBug: true,
+	isConnect: false
+}
+class Response {
+	constructor(code, msg, data) {
+		this.code = code;
+		this.msg = msg;
+		this.data = data;
 	}
+	toString() {
+		return JSON.stringify(this);
+	}
+}
+
+class Utils {
+	static modelSql(name, options) {
+		let sql = [];
+		Utils.log('options:' + options);
+		for (const key in options) {
+			if (Object.hasOwnProperty.call(options, key)) {
+				const option = options[key];
+				sql.push(Utils.restrain(key, option));
+			}
+		}
+
+		Utils.log(`modelSql: CREATE TABLE '${name}' (${sql.join(', ')})`);
+
+		return `CREATE TABLE '${name}' (${sql.join(', ')})`;
+	}
+
+	static restrain(key, options) {
+
+		let restrainArray = [];
+		restrainArray.push(`'${key}'`);
+
+		// 如果是 String 拦截处理
+		if (options.constructor != Object) {
+			restrainArray.push(Utils.toType(options));
+			return restrainArray.join(' ');
+		}
+
+		restrainArray.push(Utils.toType(options.type));
+		// 非空
+		if (options.notNull == true) {
+			restrainArray.push('NOT NULL');
+		}
+
+		// 默认值
+		if (options.default) {
+			restrainArray.push(`DEFAULT ${options.default}`);
+		}
+
+		// 是否是不同的值
+		if (options.unique == true) {
+			restrainArray.push('UNIQUE');
+		}
+
+		// 主键
+		if (options.primaryKey == true) {
+			restrainArray.push('PRIMARY KEY');
+		}
+
+		// 检查
+		if (options.check) {
+			restrainArray.push(`CHECK(${THIS_VALUE.check})`);
+		}
+
+		return restrainArray.join(' ');
+	}
+
+	static toType(jsType) {
+		let sqliteType = '';
+		if (jsType == Number) {
+			sqliteType = 'numeric';
+		} else if (jsType == Date) {
+			sqliteType = 'timestamp';
+		} else {
+			sqliteType = 'varchar';
+		}
+		return sqliteType;
+	}
+	static log() {
+		if (config.deBug) {
+			console.log.apply(null, arguments);
+		}
+	}
+}
+
+
+/**
+ * Model 对象内部public方法全部 return this;
+ */
+class Model {
 	/**
-	 * @description: 查询数据
-	 * @param {} options：可选参数
-	 * @param {Function} callback :（err,results）=>{}
+	 * 
+	 * @param {String} name 数据库表名
+	 * @param {Object} options 数据表列对象
+	 * @returns 
+	 */
+	constructor(name, options) {
+		let self = this;
+		self.name = name;
+		self.options = options;
+
+		if (config.isConnect) {
+			self.repair();
+		} else {
+			console.error('no connect');
+		}
+	}
+
+	/**
+	 * 查询表数据
+	 * @param {String|Array} options 
+	 * - String  WHERE 内容
+	 * - Array 需要查询的列
+	 * @param {*} callback 
+	 * @returns 
 	 */
 	find(options, callback) {
-		var sql = '';
+		let sql = '';
 		let self = this;
-
+		self.repair();
 		if (!callback) {
-			sql = `SELECT * FROM '${this.name}'`;
+			sql = `SELECT * FROM '${this.name}'`; // 查找全部
 			callback = options;
 		} else if (options.constructor == Array) {
-			sql = `SELECT ${options.join()} FROM '${this.name}'`;
-		} else {
-			sql = `SELECT * FROM '${this.name}' WHERE ${options}`;
+			sql = `SELECT ${options.join()} FROM '${this.name}'`; // 查找制定列
+		} else if (options.constructor == String) {
+			sql = `SELECT * FROM '${this.name}' WHERE ${options}`; // 制定条件查询
 		};
+
+		Utils.log(`find: ${sql}`);
+
 		plus.sqlite.selectSql({
-			name: self.db,
+			name: config.name,
 			sql: sql,
 			success(e) {
 				callback(null, e);
@@ -55,25 +150,36 @@ class Model {
 			fail(e) {
 				callback(e);
 			}
-		})
-		return this;
+		});
+
+		return self;
 	}
+
 	/**
 	 * @description: 分页查询
 	 * @param {Object} options :   { where:查询条件, number: 当前页数 , count : 每页数量 }
-	 * @return: 
+	 * @param {Function} callback :（err,results）=>{} 
+	 * @return
 	 */
 	limit(options, callback) {
-		var sql = '';
+		let sql = '';
 		let self = this;
+		self.repair();
+		
 		if (!options.where) {
-			sql = `SELECT * FROM '${this.name}' LIMIT ${options.count} OFFSET ${(options.number - 1) * options.count}`
+			// 不存在 where
+			sql =
+				`SELECT * FROM '${this.name}' LIMIT ${options.count} OFFSET ${(options.number - 1) * options.count}`
 		} else {
+			// 存在 where
 			sql =
 				`SELECT * FROM '${this.name}' WHERE ${options.where} LIMIT ${options.count} OFFSET ${(options.number - 1) * options.count}`;
 		};
+
+		Utils.log(`limit: ${sql}`);
+
 		plus.sqlite.selectSql({
-			name: self.db,
+			name: config.name,
 			sql: sql,
 			success(e) {
 				callback(null, e);
@@ -81,80 +187,81 @@ class Model {
 			fail(e) {
 				callback(e);
 			}
-		})
+		});
 		return this;
 	}
+
 	/**
 	 * @description: 插入数据
-	 * @param {Object} obj:对象或者数组
+	 * @param {Object|Array} options: 需要插入的单个或者多个数据
 	 * @param {Function} callback :（err,results）=>{}
 	 */
-	insert(obj, callback) {
+	insert(options, callback) {
 		let self = this;
-		if (!true) {
-			// todo
-		} else {
-			if (Array.isArray(obj)) {
-				for (var i = 0; i < obj.length; i++) {
-					this.insertObj(obj[i], callback)
+		self.repair();
+		
+		if (config.isConnect) {
+			if (options.constructor == Array) {
+				for (var i = 0; i < options.length; i++) {
+					this.insert(options[i], callback)
 				}
-			} else {
-				this.insertObj(obj, callback)
+			} else if (options.constructor == Object) {
+				let keys = [];
+				let values = [];
+				for (var key in options) {
+					keys.push(key);
+					values.push(`'${options[key]}'`);
+				}
+
+				let sql = `INSERT INTO '${this.name}' (${keys.join()}) VALUES (${values.join()})`;
+
+				Utils.log(`insert: ${sql}`);
+				plus.sqlite.executeSql({
+					name: config.name,
+					sql: sql,
+					success(e) {
+						callback(null, e);
+					},
+					fail(e) {
+						callback(e);
+					}
+				})
 			}
 		}
 		return this;
 	}
 
-	insertObj(obj, callback) {
-		let keys = [];
-		let values = '';
-		let self = this;
-		for (var key in obj) {
-			keys.push(key);
-			values += `'${obj[key]}',`;
-		};
-		values = values.replace(/,$/, '');
-		let sql = `INSERT INTO '${this.name}' (${keys.join()}) VALUES (${values})`;
-		console.log(sql);
-		plus.sqlite.executeSql({
-			name: self.db,
-			sql: sql,
-			success(e) {
-				callback(null, e);
-			},
-			fail(e) {
-				callback(e);
-			}
-		})
-		return this;
-	}
 	/**
 	 * @description: 更新数据
-	 * @param {Object} option：可选参数 更新条件 // TODO 更新条件
+	 * @param {Object} options：可选参数 更新条件
 	 * @param {Object} obj： 修改后的数据 
 	 * @param {Function} callback :（err,results）=>{}
 	 */
-	update(option, obj, callback) {
+	update(options, obj, callback) {
 		let sql = '';
 		let self = this;
-		if (arguments.length == 2) {
+		let items = [];
+		self.repair();
+
+		if (!callback) {
+			// 不存在options
 			callback = obj;
-			obj = option;
-			sql = `UPDATE '${this.name}' SET `;
+			obj = options;
+
 			for (var key in obj) {
-				sql += `${key}='${obj[key]}', `;
+				items.push(`${key}='${obj[key]}'`);
 			};
-			sql = sql.replace(/(, )$/, '');
+			sql = `UPDATE '${this.name}' SET ${items.join()}`;
 		} else {
-			sql = `UPDATE ${this.name} SET `;
+			// 存在options
 			for (var key in obj) {
-				sql += `${key}='${obj[key]}', `;
+				items.push(`${key}='${obj[key]}'`);
 			};
-			sql = sql.replace(/(, )$/, '');
-			sql += ` WHERE ${option}`;
+			sql = `UPDATE ${this.name} SET ${items.join()} WHERE ${options}`;
 		};
+		Utils.log(`update: ${sql}`);
 		plus.sqlite.executeSql({
-			name: self.db,
+			name: config.name,
 			sql: sql,
 			success(e) {
 				callback(null, e);
@@ -162,25 +269,30 @@ class Model {
 			fail(e) {
 				callback(e);
 			}
-		})
+		});
+
 		return this;
 	}
+
 	/**
 	 * @description: 删除数据
-	 * @param {Object} option：可选参数 删除条件
+	 * @param {Object} options ：可选参数 删除条件
 	 * @param {Function} callback :（err,results）=>{}
 	 */
-	delete(option, callback) {
+	delete(options, callback) {
 		var sql = '';
 		let self = this;
+		self.repair();
+
 		if (!callback) {
 			sql = `DELETE FROM '${this.name}'`;
-			callback = option;
+			callback = options;
 		} else {
-			sql = `DELETE FROM '${this.name}' WHERE ${option}`;
+			sql = `DELETE FROM '${this.name}' WHERE ${options}`;
 		};
+		Utils.log(`delete: ${sql}`);
 		plus.sqlite.executeSql({
-			name: self.db,
+			name: config.name,
 			sql: sql,
 			success(e) {
 				callback(null, e);
@@ -188,9 +300,99 @@ class Model {
 			fail(e) {
 				callback(e);
 			}
-		})
+		});
+
 		return this;
 	}
+
+
+	/**
+	 * @description:  重命名或者新增列
+	 * @param {Object} options 参数 数组为新增多列 对象为新增单列{aa} 字符串重命名
+	 * @param {Function} callback :（err,results）=>{}
+	 * @return: 
+	 */
+	alter(options, callback) {
+		let self = this;
+		let sql = '';
+		self.repair();
+		
+		if (options.constructor == Array) { // 新增多列
+			for (let i = 0; i < options.length; i++) {
+				self.alter(options[i], callback);
+			}
+		} else if (options.constructor == Object) { // 新增单列
+			let column = Utils.restrain(options.name, options.option);
+			sql = `ALTER TABLE '${this.name}' ADD COLUMN ${column}`
+		} else if (options.constructor == String) { // 重命名
+			sql = `ALTER TABLE '${self.name}' RENAME TO '${options}'`
+		}
+		Utils.log(`alter: ${sql}`);
+		plus.sqlite.selectSql({
+			name: config.name,
+			sql: sql,
+			success(e) {
+				if (options.constructor == String) { // 重命名
+					self.name = options;
+				}
+				callback(null, e);
+			},
+			fail(e) {
+				callback(e);
+			}
+		});
+		return this;
+	}
+
+	join(model, options, callback) {
+		if (!model) {
+			console.error('"model" cannot be empty.');
+		}
+		if (options.constructor != Object) {
+			console.error('The type of "options" is wrong, it should be "Object".');
+		}
+		if (!options.type || !options.predicate) {
+			console.error('Missing required parameters');
+		}
+
+		let leftName = this.name;
+		let rightName = model.name;
+		let leftValue = options.predicate.left;
+		let rightValue = options.predicate.right;
+		let cols = ['*'];
+		self.repair();
+		
+		const SQL_MAP = {
+			cross: `SELECT ${cols.join()} FROM ${leftName} CROSS JOIN ${rightName};`,
+			inner: [`SELECT ${cols.join()} FROM ${leftName} NATURAL JOIN ${rightName}`,
+				`SELECT ${cols.join()} FROM ${leftName}  INNER JOIN ${rightName} ON ${leftName}.${leftValue} = ${rightName}.${rightValue}`
+			],
+			outer: `SELECT ${cols.join()} FROM ${leftName}  OUTER JOIN ${rightName} ON ${leftName}.${leftValue} = ${rightName}.${rightValue}`
+		}
+
+		let sql = '';
+		if (options.type == inner && !options.predicate) {
+			sql = SQL_MAP[options.type][0];
+		} else if (options.type == inner && !options.predicate) {
+			sql = SQL_MAP[options.type][1];
+		} else {
+			sql = SQL_MAP[options.type];
+		}
+
+		Utils.log(`join: ${sql}`);
+		plus.sqlite.selectSql({
+			name: config.name,
+			sql: sql,
+			success(e) {
+				callback(null, e);
+			},
+			fail(e) {
+				callback(e);
+			}
+		});
+		return this;
+	}
+
 	/**
 	 * @description: 执行sql语句
 	 * @param {String} sql : sql语句
@@ -198,8 +400,33 @@ class Model {
 	 */
 	sql(sql, callback) {
 		let self = this;
+		self.repair();
+		
+		Utils.log(`sql: ${sql}`);
 		plus.sqlite.selectSql({
-			name: self.db,
+			name: config.name,
+			sql: sql,
+			success(e) {
+				callback(null, e);
+			},
+			fail(e) {
+				callback(e);
+			}
+		});
+		return this;
+	}
+
+	/**
+	 * 判断是否存在 
+	 * @param {Function} callback 
+	 */
+	isExist(callback) {
+		let sql = `SELECT count(*) AS isExist FROM sqlite_master WHERE type='table' AND name='${this.name}'`;
+		let self = this;
+		Utils.log(`isExist: ${sql}`);
+		Utils.log(`isExist: ${config.name}`);
+		plus.sqlite.selectSql({
+			name: config.name,
 			sql: sql,
 			success(e) {
 				callback(null, e);
@@ -211,15 +438,17 @@ class Model {
 		return this;
 	}
 	/**
-	 * @description: 删除model表格 （慎用！）
-	 * @param {type} 
-	 * @return: 
+	 * 删除数据表 **不推荐**
+	 * @param {Function} callback 
 	 */
 	drop(callback) {
 		var sql = `DROP TABLE '${this.name}'`;
 		let self = this;
+		self.repair();
+		
+		Utils.log(`drop: ${sql}`);
 		plus.sqlite.selectSql({
-			name: self.db,
+			name: config.name,
 			sql: sql,
 			success(e) {
 				callback(null, e);
@@ -228,134 +457,120 @@ class Model {
 				callback(e);
 			}
 		});
-		return this;
-	}
-	connect(callback) {
-		let sql = `SELETE count(*) AS isTable FROM sqlite_master WHERE type='table' AND name='${this.name}'`;
-		let self = this;
-		plus.sqlite.selectSql({
-			name: self.db,
-			sql: sql,
-			success(e) {
-				callback(null, e);
-			},
-			fail(e) {
-				callback(e);
-			}
-		});
-		return this;
-	}
-	isExist(callback) {
-		let self = this;
-		// return new Promise((resolve, reject) => {
-			plus.sqlite.selectSql({
-				name: self.db,
-				sql: `select count(*) as isExist FROM sqlite_master where type='table' and name='${this.name}'`,
-				success(e) {
-					callback(null, e[0].isExist ? true : false)
-				},
-				fail(e) {
-					console.log(e)
-					callback(e)
-					// reject(e);
-				}
-			})
 		return this;
 	}
 
+	/**
+	 * 创建数据表 **不推荐**
+	 * @param {Function} callback 
+	 */
 	create(callback) {
 		let self = this;
-		this.tableSQL = usqlite.modelSql(self.name, self.option);
+		let sql = Utils.modelSql(self.name, self.options);
+		Utils.log(`create: ${sql}`);
 		plus.sqlite.executeSql({
-			name: self.db,
-			sql: self.tableSQL,
+			name: config.name,
+			sql: sql,
 			success(e) {
 				callback(null, e);
 			},
 			fail(e) {
 				callback(e)
 			}
-		})
+		});
 		return this;
 	}
+
+	toString() {
+		return `[${this.name} Model]`;
+	}
+ 
+	repair() {
+		let self = this;
+		self.isExist(function(e, r) {
+			if (e) {
+				console.error(e);
+			}
+			
+			if (!r[0].isExist) {
+				self.create(function(e, r) {
+					Utils.log(e, r);
+				});
+			}
+		});
+	}
+	// TODO 更新表结构
+	// TODO 数据表备份?? 
+	// TODO 多表联查
+	// TODO 下班了其他的想不起来 回头再说
 }
 
 
-usqlite = {
+// 单例模式
+export class usqlite {
 	/**
-	 * @description:连接数据库
-	 * @param {String} name: 数据库名称*
-	 * @param {String} path: 数据库路径*
-	 * @param {Function} callback :（err,results）=>{}
-	 * @return: 
+	 * 构造函数
+	 * @param {Object} options 数据库配置信息 *
+	 * {name: 'demo', path: '_doc/demo.db'}
+	 * - name 数据库名称*
+	 * - path 数据库路径
+	 * @param {Function} callback 
 	 */
-	connect({
-		name = '',
-		path = ''
-	}, callback) {
-		options = {
-			name, // 数据库名称*
-			path, // 数据库路径*
-		};
+	constructor(options, callback) {
+		console.warn('No instantiation');
+	}
+	/**
+	 * 链接数据库
+	 * @param {Object} options 数据库配置信息 *
+	 * {name: 'demo', path: '_doc/demo.db'}
+	 * - name 数据库名称*
+	 * - path 数据库路径
+	 * @param {Function} callback 
+	 */
+	static connect(options, callback) {
+		config.name = options.name; // 数据库名称*
+		config.path = options.path; // 数据库名称*
+
 		plus.sqlite.openDatabase({
-			name: options.name, //数据库名称
-			path: options.path, //数据库地址
+			name: config.name, //数据库名称
+			path: config.path, //数据库地址
 			success(e) {
-				isConnect = true;
+				config.isConnect = true;
 				callback(null, e);
 			},
 			fail(e) {
+				if (e.code == -1402) {
+					config.isConnect = true;
+				}
 				callback(e);
 			}
-		})
-	},
+		});
+	}
 	/**
-	 * @description:关闭数据库
-	 * @param {Function} callback :（err,results）=>{}
-	 * @return: 
+	 * 断开数据库
+	 * @param {*} callback 
 	 */
-	close(callback) {
+	static close(callback) {
 		plus.sqlite.closeDatabase({
-			name: options.name, //数据库名称
-			path: options.path, //数据库地址
+			name: config.name, //数据库名称
+			path: config.path, //数据库地址
 			success(e) {
-				isConnect = false;
+				config.isConnect = false;
 				callback(null, e);
 			},
 			fail(e) {
 				callback(e);
 			}
 		});
-	},
+	}
 	/**
-	 * @description:创建model (表格模型对象)
-	 * @param {String} name:表格名称
-	 * @param {Object} options:表格数据结构 
-	 * @return: Model对象：负责数据库增删改查
+	 * 创建 Model 对象
+	 * @param {String} name 数据表名称 *
+	 * @param {String} options 参数配置 *
+	 * @returns 返回 Model 对象
 	 */
-	model(name, option) {
-		return new Model(name, option, options.name);
-	},
-	/**
-	 * @description 生成创建model的modelSql
-	 * @param {Object} name
-	 * @param {Object} option
-	 */
-	modelSql(name, option) {
-		let str = '`usql_id` integer PRIMARY KEY,'; // usql_id 为自增主键
-		for (var key in option) {
-			if (option[key] == Number) {
-				str += `'${key}' numeric,`;
-			} else if (option[key] == Date) {
-				str += `'${key}' timestamp,`;
-			} else {
-				str += `'${key}' varchar,`;
-			}
-		};
-		str = str.replace(/,$/, '');
-		return `CREATE TABLE '${name}' (${str})`;
+	static model(name, options) {
+		Utils.log(config);
+		return new Model(name, options);
 	}
 }
-
-
-export var usqlite;

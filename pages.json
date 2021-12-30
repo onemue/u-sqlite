@@ -7,6 +7,18 @@
 		// 	}
 		// },
 		{
+			"path": "pages/home/home",
+			"style": {
+				"navigationBarTitleText": "记事本"
+			}
+		},
+		{
+			"path": "pages/node/node",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
 			"path": "uni_modules/onemue-usqlite-console/components/onemue-usqlite-console/onemue-usqlite-console",
 			"style": {
 				"navigationBarTitleText": "uSQLite-console"

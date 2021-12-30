@@ -1,5 +1,13 @@
 import App from './App'
-import { usqlite } from '@/uni_modules/onemue-USQLite/js_sdk/usqlite.js'
+// import { usqlite } from '@/uni_modules/onemue-USQLite/js_sdk/usqlite.js'
+import { usqlite } from '@/uni_modules/onemue-USQLite/js_sdk/usqlite.js' // 挂载 v2 版本
+import sql from "@/model/index.js"
+usqlite.connect({
+    name: 'demo',// 数据库名称
+    path:'_doc/demo.db', // 路径
+});
+ 
+uni.sql = sql; // 绑定所有model 到uni.sql 或者其他都可以 只有usqlite v2才支持这种写法
 uni.$sql = usqlite;
 
 Vue.prototype.dbOptions = {

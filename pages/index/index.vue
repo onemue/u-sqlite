@@ -13,7 +13,9 @@
 				</button>
 			</view>
 		</view>
-		<usql-console>aaa</usql-console>
+		<!-- 		<view class="usql-console">
+			<usql-console>aaa</usql-console>
+		</view> -->
 	</view>
 </template>
 
@@ -38,12 +40,13 @@
 					},
 					{
 						name: "版本",
-						describe: "v 0.0.0",
+						describe: "v 2.0.0",
 					},
 					{
 						name: "SQLite",
-						describe: "SQLite 封装的方法",
+						describe: "SQLite 封装的方法，更加完善的调用方法",
 						function: {
+							"打开demo": this.openNote,
 							"链接数据库": this.connectDatabase,
 							"检测是否链接数据库": this.isConnect,
 							"创建Model": this.createModel,
@@ -58,6 +61,9 @@
 							"删除操作": this.delete,
 							"条件删除": this.whereDelete,
 							"清空操作": this.drop,
+							"修改表名": this.alter,
+							"新增加行": this.alterAddCol,
+							"新增加多行": this.alterAddCols,
 							"执行自定义SQL语句": this.diySQL,
 							"链式调用": this.links,
 							"console": this.console
@@ -70,6 +76,18 @@
 
 		},
 		methods: {
+			openNote: function() {
+				console.log("open note");
+				uni.redirectTo({
+					url: '../home/home',
+					success: function(){
+	
+					},
+					fail(e) {
+						console.log(e)
+					}
+				})
+			},
 			connectDatabase: function() {
 				uni.$sql.connect(this.sqlOptions, function(err, results) {
 					if (err) {
@@ -84,10 +102,17 @@
 			},
 			createModel: function() {
 				this.sqlModel = uni.$sql.model(
-					'sqlModel2', {
-						id: 'String',
-						content: 'String',
-						// N_a: Number,
+					'sqlModel7', {
+						id: {
+							primaryKey: true,
+							type: String
+						},
+						content: String,
+						N_a: {
+							type: Number,
+							default: 666,
+							uniquet: true,
+						},
 						B_b: Boolean
 					}
 				);
@@ -198,6 +223,39 @@
 						console.log('P2:  ' + e, r);
 					})
 			},
+			alterAddCols: function() {
+				this.sqlModel
+					.alter([{
+							name: 'newCol1',
+							option: String
+						},
+						{
+							name: 'newCol2',
+							option: String
+						},
+						{
+							name: 'newCol3',
+							option: String
+						}
+					], function(e, r) {
+						console.log(e, r);
+					})
+			},
+			alterAddCol: function() {
+				this.sqlModel
+					.alter({
+						name: 'newCol',
+						option: String
+					}, function(e, r) {
+						console.log(e, r);
+					})
+			},
+			alter: function() {
+				this.sqlModel
+					.alter('demo', function(e, r) {
+						console.log(e, r);
+					})
+			},
 			console: function() {
 
 			}
@@ -240,5 +298,15 @@
 		background: #eee;
 		border-width: 0;
 		margin-top: 4px;
+
+	}
+
+	.usql-console {
+		position: fixed;
+		width: 80vw;
+		height: 80vh;
+		top: 0px;
+		left: 10vw;
+		background-color: #fff;
 	}
 </style>
