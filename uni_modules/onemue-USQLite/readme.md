@@ -38,6 +38,7 @@ let studentModel = uni.$sql.model('student',{
 });
 ```
 **约束**
+
 > 使用对象时，以约束模式处理，此时对象`type`为类型。
 > 使用一下内容，为约束。
 > `default`需要设置默认值，如：`{default: 0}`。
@@ -48,6 +49,10 @@ let studentModel = uni.$sql.model('student',{
 - unique UNIQUE 不重复
 - default DEFAULT 默认值
 - notNull NOT NULL 非空
+
+**联合主键**
+
+> 在两列的约束同时设置`primaryKey`值为`true`时，可以创建联合主键。
 
 > ~~如果没有主键，会自动添加主键`usql_id`。~~(已经移除)
 
@@ -121,12 +126,13 @@ studentModel.limit({where:'age>28',number:1,count:10},(err,results)=>{
     console.log(results);
 });
 ```
-#### 1.3-多表查询
+#### 1.3-多表查询 
 > Join 用于结合两个或多个数据库中表的记录。
 > 有三种链接形式：
 > 交叉连接 - CROSS JOIN 连接的两个表所有数据行的笛卡尔积
 > 内连接 - INNER JOIN 只返回 左表在右表中有有匹配的行。
 > 外连接 - OUTER JOIN 返回左表所有的行，即使在右表中没有匹配的行
+
 ```js
 studentModel.join(	// 左表
 	resultModel, 	// 右表
@@ -134,8 +140,8 @@ studentModel.join(	// 左表
 		where: 'grade<60',	// 筛选条件
 		type: 'inner',		// 链接模式
 		predicate: {		// 谓语匹配词语
-			left: 'id',
-			right: 'id'
+			left: 'id',     // 左表
+			right: 'id'     // 右表
 		}
 	}, 
 	function(e, r){
