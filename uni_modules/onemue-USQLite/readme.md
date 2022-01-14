@@ -88,6 +88,17 @@ studentModel.insert(arr, (err, results) => {
     if (!err) console.log('增加成功');
 });
 ```
+> v2.1.0
+> 感谢 `@风扬`
+> 新增了事件选项（options, index），因为批量增加是遍历数组依次执行，所以callback回执行多次，可以使用第三，第四个（options, index）参数，判断是哪一个添加的数组出现了问题
+> 例如：
+> ```js
+> studentModel.insert(arr, (err, results, option, index) => {
+>    console.log(err);
+>    console.log(results);
+>    if (!err) console.log('增加成功');
+>    console.log(`第${index}条数据出现问题，姓名是：${option.name}`) // index 从0开始
+> });
 
 #### 1.2-查询操作
 **1-查询所有数据**

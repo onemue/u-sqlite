@@ -218,11 +218,12 @@ class Model {
 		if (config.isConnect) {
 			if (options.constructor == Array) {
 				for (var i = 0; i < options.length; i++) {
-					this.insert(options[i], callback)
+					this.insert(options[i], callback, i);
 				}
 			} else if (options.constructor == Object) {
 				let keys = [];
 				let values = [];
+				let index = arguments[3]??null;
 				for (var key in options) {
 					keys.push(key);
 					values.push(`'${options[key]}'`);
@@ -235,10 +236,16 @@ class Model {
 					name: config.name,
 					sql: sql,
 					success(e) {
-						callback(null, e);
+						if(index){
+							callback(null, e, options, index);
+						}
+						callback(null, e, options);
 					},
 					fail(e) {
-						callback(e);
+						if(index){
+							callback(e, null, options, index);
+						}
+						callback(e, null, options);
 					}
 				})
 			}
