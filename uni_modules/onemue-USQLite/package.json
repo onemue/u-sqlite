@@ -1,12 +1,12 @@
 {
   "id": "onemue-USQLite",
   "displayName": "u-SQLite V2",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "基于ORM技术，使用对象的方式来操作sqlite数据库，而无需编写任何sql语句.",
   "keywords": [
     "USQLite,数据库操作,缓存,大数据缓存,sqlite,sql,orm"
 ],
-  "repository": "https://codechina.csdn.net/qq_41986908/USQLite",
+  "repository": "https://github.com/onemue/u-sqlite",
   "engines": {
     "HBuilderX": "^3.1.0"
   },

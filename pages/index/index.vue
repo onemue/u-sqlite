@@ -102,16 +102,17 @@
 			},
 			createModel: function() {
 				this.sqlModel = uni.$sql.model(
-					'sqlModel7', {
+					'aaafalse', {
 						id: {
-							primaryKey: true,
+							primaryKey: false,
 							type: String
 						},
 						content: String,
 						N_a: {
+							primaryKey: false,
 							type: Number,
 							default: 666,
-							uniquet: true,
+							unique: true,
 						},
 						B_b: Boolean
 					}
@@ -147,12 +148,12 @@
 					content: 'this is content：' + Math.random().toString(16).slice(2),
 					// number: 666,
 					B_b: Math.random() > 0.5 ? true : false
-				}, function(err, results) {
+				}, function(err, results, option, index) {
 					if (err) {
 						console.log(err);
 						return;
 					}
-					console.log(results);
+					console.log(results, option);
 				});
 			},
 			find: function() {
