@@ -6,7 +6,7 @@
  * @by onemue
  */
 
-let config = {
+ let config = {
 	deBug: true,
 	isConnect: false
 }
@@ -37,10 +37,13 @@ class Utils {
 				}
 			}
 		}
+		
 		Utils.log(primaryKeyArr.length);
-		if (primaryKeyArr.length>=1) {
-			sql = `CREATE TABLE '${name}' (${sqlArr.join(', ')}, PRIMARY KEY (${primaryKeyArr.join()}))`;
-		}else{
+		if (primaryKeyArr.length>1) {
+			
+			sql = `CREATE TABLE '${name}' (${sqlArr.join(', ').replaceAll(' PRIMARY KEY','')}, PRIMARY KEY (${primaryKeyArr.join()}))`;
+		}
+		else{
 			sql = `CREATE TABLE '${name}' (${sqlArr.join(', ')})`;
 		}
 		Utils.log(`modelSql :${sql}`);
@@ -59,6 +62,22 @@ class Utils {
 		}
 
 		restrainArray.push(Utils.toType(options.type));
+		
+		// 主键
+		if (options.primaryKey == true) {
+			if(options.autoIncrement != true){
+				restrainArray.push('PRIMARY KEY');
+			}
+		}
+		
+		// 自增
+		if (Utils.isNumber(options.type)&&options.autoIncrement == true) {
+			restrainArray.pop();
+			restrainArray.push('INTEGER');
+			restrainArray.push('PRIMARY KEY');
+			restrainArray.push('AUTOINCREMENT');
+		}
+		
 		// 非空
 		if (options.notNull == true) {
 			restrainArray.push('NOT NULL');
@@ -74,10 +93,6 @@ class Utils {
 			restrainArray.push('UNIQUE');
 		}
 
-		// 主键
-		// if (options.primaryKey === true) {
-		// 	restrainArray.push('PRIMARY KEY');
-		// }
 
 		// 检查
 		if (options.check) {
@@ -87,27 +102,44 @@ class Utils {
 		return restrainArray.join(' ');
 	}
 
-	// 联合主键
-	static getUnionPrimaryKey() {
-
-	}
-
 	static toType(jsType) {
 		let sqliteType = '';
-		if (jsType == Number) {
+		if (Utils.isNumber(jsType)) {
 			sqliteType = 'numeric';
-		} else if (jsType == Date) {
+		} else if (Utils.isDate(jsType)) {
 			sqliteType = 'timestamp';
 		} else {
 			sqliteType = 'varchar';
 		}
 		return sqliteType;
 	}
+	
 	static log() {
 		if (config.deBug) {
 			console.log.apply(null, arguments);
 		}
 	}
+	
+	static warn() {
+		if (config.deBug) {
+			console.warn.apply(null, arguments);
+		}
+	}
+	
+	static error() {
+		console.error.apply(null, arguments);
+	}
+	
+	static isArray(value){ return Object.prototype.toString.call(value) === '[object Array]'}
+	static isObject(value){ return Object.prototype.toString.call(value) === '[object Object]'}
+	static isString(value){ return Object.prototype.toString.call(value) === '[object String]'}
+	static isFunction(value){ return (value === Function || Object.prototype.toString.call(value) === '[object Function]')}
+	static isNumber(value){ return (value === Number || Object.prototype.toString.call(value) === '[object Number]')}
+	static isNaN(value){ return (Object.prototype.toString.call(value) === '[object Number]' && isNaN(value))}
+	static isBoolean(value){ return Object.prototype.toString.call(value) === '[object Boolean]'}
+	static isUndefined(value){ return Object.prototype.toString.call(value) === '[object Undefined]'}
+	static isModel(value){ return Object.prototype.toString.call(value) === '[object Model]'}
+	static isDate(value){ return (value === Date||Object.prototype.toString.call(value) === '[object Date]')}
 }
 
 
@@ -118,7 +150,7 @@ class Model {
 	/**
 	 * @constructor
 	 * @param {String} name 数据库表名
-	 * @param {Object} options 数据表列对象
+	 * @param {} options 数据表列对象
 	 * @returns 
 	 */
 	constructor(name, options) {
@@ -129,7 +161,10 @@ class Model {
 		if (config.isConnect) {
 			self.repair();
 		} else {
-			console.error('no connect');
+			if(!config.name||!config.path){
+				console.error('"config.name" or "config.path" is empty');
+			}
+			usqlite.connect(config);
 		}
 	}
 
@@ -138,21 +173,27 @@ class Model {
 	 * @param {String|Array} options 
 	 * - String  WHERE 内容
 	 * - Array 需要查询的列
-	 * @param {*} callback 
+	 * @param {Function} callback 
 	 * @returns 
 	 */
 	find(options, callback) {
 		let sql = '';
 		let self = this;
 		self.repair();
-		if (!callback) {
+		if(!(Utils.isString(options)||Utils.isArray(options)||Utils.isFunction(options))) {
+			Utils.error('The first parameter of Model.find should be "Array", "String" or "Function" (when there is only one parameter).')
+		}
+		if(!callback&&!(Utils.isFunction(options))) {
+			Utils.error('The second parameter of Model.find should be "Function".')
+		}
+		if (!callback&&Utils.isFunction(options)) {
 			sql = `SELECT * FROM '${this.name}'`; // 查找全部
 			callback = options;
-		} else if (options.constructor == Array) {
+		} else if (Utils.isArray(options)) {
 			sql = `SELECT ${options.join()} FROM '${this.name}'`; // 查找制定列
-		} else if (options.constructor == String) {
+		} else if (Utils.isString(options)) {
 			sql = `SELECT * FROM '${this.name}' WHERE ${options}`; // 制定条件查询
-		};
+		}
 
 		Utils.log(`find: ${sql}`);
 
@@ -180,7 +221,13 @@ class Model {
 		let sql = '';
 		let self = this;
 		self.repair();
-
+		if(!Utils.isObject(options)){
+			Utils.error('The first parameter of Model.limit should be "Object".')
+		}
+		if(!Utils.isFunction(callback)){
+			Utils.error('The second parameter of Model.limit should be "Function".')
+		}
+		
 		if (!options.where) {
 			// 不存在 where
 			sql =
@@ -215,16 +262,29 @@ class Model {
 		let self = this;
 		self.repair();
 
+		if(!(Utils.isObject(options)||Utils.isArray(options))){
+			Utils.error('The first parameter of Model.insert should be "Object" or "Array".')
+		}
+		if(!Utils.isFunction(callback)){
+			Utils.error('The second parameter of Model.insert should be "Function".')
+		}
+		
 		if (config.isConnect) {
-			if (options.constructor == Array) {
-				for (var i = 0; i < options.length; i++) {
-					this.insert(options[i], callback, i);
-				}
-			} else if (options.constructor == Object) {
+			if (Utils.isArray(options)) {
+				self.bulkInsert(options).then(function (params) {
+					callback(null, params);
+				}).catch(function (err) {
+					callback(err);
+				})
+			} else if (Utils.isObject(options)) {
 				let keys = [];
 				let values = [];
 				let index = arguments[3]??null;
 				for (var key in options) {
+					if (!Object.hasOwnProperty.call(self.options, key)) {
+						Utils.warn(`The parameter '${key}' was not declared in the Model, is not stored in the database.`)
+						continue;
+					}
 					keys.push(key);
 					values.push(`'${options[key]}'`);
 				}
@@ -253,9 +313,33 @@ class Model {
 		return this;
 	}
 
+
+	bulkInsert(array, callback){
+		let sql = '';
+		let self = this;
+		self.repair();
+		if(!Utils.isArray(array)){
+			Utils.error('The first parameter of Model.bulkInsert should be "Array".')
+		}
+		if(!Utils.isFunction(callback)){
+			Utils.error('The second parameter of Model.bulkInsert should be "Function".')
+		}
+		await self.beginTransaction();
+
+		try {
+			for (var i = 0; i < options.length; i++) {
+				self.insert(options[i], callback, i);
+			}
+			await self.commitTransaction();
+		} catch (error) {
+			await self.rollbackTransaction();
+			callback(error);
+		}
+	}
+
 	/**
 	 * @description 更新数据
-	 * @param {Object} options：可选参数 更新条件
+	 * @param {String} options：可选参数 更新条件
 	 * @param {Object} obj： 修改后的数据 
 	 * @param {Function} callback :（err,results）=>{}
 	 */
@@ -264,7 +348,14 @@ class Model {
 		let self = this;
 		let items = [];
 		self.repair();
-
+		
+		if(!(Utils.isObject(options)||Utils.isString(options))){
+			Utils.error('The first parameter of Model.update should be "Object" or "String".')
+		}
+		if(!(Utils.isObject(obj)||Utils.isFunction(obj))){
+			Utils.error('The second parameter of Model.update should be "Objrct" or "Function".')
+		}
+		
 		if (!callback) {
 			// 不存在options
 			callback = obj;
@@ -298,13 +389,20 @@ class Model {
 
 	/**
 	 * @description 删除数据
-	 * @param {Object} options ：可选参数 删除条件
+	 * @param {String} options ：可选参数 删除条件
 	 * @param {Function} callback :（err,results）=>{}
 	 */
 	delete(options, callback) {
 		var sql = '';
 		let self = this;
 		self.repair();
+		
+		if(!(Utils.isString(options)||Utils.isFunction(options))){
+			Utils.error('The first parameter of Model.delete should be "Object" or "Function".')
+		}
+		if(callback&&!Utils.isFunction(callback)){
+			Utils.error('The second parameter of Model.delete should be "Function".')
+		}
 
 		if (!callback) {
 			sql = `DELETE FROM '${this.name}'`;
@@ -330,7 +428,7 @@ class Model {
 
 	/**
 	 * @description  重命名或者新增列
-	 * @param {Object} options 参数 数组为新增多列 对象为新增单列{aa} 字符串重命名
+	 * @param {Object|Array|String} options 参数 数组为新增多列 对象为新增单列{aa} 字符串重命名
 	 * @param {Function} callback :（err,results）=>{}
 	 * @return: 
 	 */
@@ -338,12 +436,18 @@ class Model {
 		let self = this;
 		let sql = '';
 		self.repair();
-
-		if (options.constructor == Array) { // 新增多列
+		if(!(Utils.isObject(options)||Utils.isArray(options)||Utils.isString(options))){
+			Utils.error('The first parameter of Model.alter should be "Object", "Array" or "String".')
+		}
+		if(!Utils.isFunction(callback)){
+			Utils.error('The second parameter of Model.alter should be "Function".')
+		}
+		
+		if (Utils.isArray(options)) { // 新增多列
 			for (let i = 0; i < options.length; i++) {
 				self.alter(options[i], callback);
 			}
-		} else if (options.constructor == Object) { // 新增单列
+		} else if (Utils.isObject(options)) { // 新增单列
 			let column = Utils.restrain(options.name, options.option);
 			sql = `ALTER TABLE '${this.name}' ADD COLUMN ${column}`
 		} else if (options.constructor == String) { // 重命名
@@ -374,13 +478,13 @@ class Model {
 	 */
 	join(model, options, callback) {
 		if (!model) {
-			console.error('"model" cannot be empty.');
+			Utils.error('"model" cannot be empty.');
 		}
-		if (options.constructor != Object) {
-			console.error('The type of "options" is wrong, it should be "Object".');
+		if (!Utils.isObject(options)) {
+			Utils.error('The type of "options" is wrong, it should be "Object".');
 		}
 		if (!options.type || !options.predicate) {
-			console.error('Missing required parameters');
+			Utils.error('Missing required parameters');
 		}
 
 		let leftName = this.name;
@@ -421,12 +525,121 @@ class Model {
 		return this;
 	}
 
+	// TODO Transaction 
+	/**
+	 * @param {String} control 事务控制
+	 * @param {Function} callback 回调函数
+	 */
+	transaction(control, callback){
+		let self = this;
+
+		if(!Utils.isString(control)){
+			Utils.error('The first parameter of Model.transaction should be "String".')
+		}
+		if(!Utils.isFunction(callback)){
+			Utils.error('The second parameter of Model.transaction should be "Function".')
+		}
+
+		if (control === 'begin'||control === 'start') {
+			self.beginTransaction().then(()=>{
+				callback(null);
+			}
+			).catch(e=>{
+				callback(e);
+			});
+		} 
+		else if (control === 'commit'||control === 'end') {
+			self.commitTransaction().then(()=>{
+				callback(null);
+			}
+			).catch(e=>{
+				callback(e);
+			});
+		}
+		else if (control === 'rollback'||control === 'cancel') {
+			self.rollbackTransaction().then(()=>{
+				callback(null);
+			}
+			).catch(e=>{
+				callback(e);
+			});
+		}
+		else {
+			// 提示错误 control参数错误 应该为begin|commit|rollback
+			Utils.error('Parameter "control" is wrong, should be "begin|commit|rollback"');
+		}
+	}
+	
+	/**
+	 * beginTransaction 开启事务
+	 * @returns {Promise}
+	 */
+	async beginTransaction(){
+		return await new Promise(function(resolve, reject){
+			plus.sqlite.transaction({
+				name: config.name,
+				operation: 'begin',
+				success: function(e){
+					resolve();
+				},
+				fail: function(e){
+					reject(e);
+				}
+			});
+		})
+	}
+	
+	/**
+	 * commitTransaction 提交事务
+	 * @returns {Promise}
+	 */
+	async commitTransaction(){
+		return await new  Promise(function(resolve, reject){
+			plus.sqlite.transaction({
+				name: config.name,
+				operation: 'commit',
+				success: function(e){
+					resolve();
+				},
+				fail: function(e){
+					reject(e);
+				}
+			});
+		})
+	}
+	
+	/**
+	 * rollbackTransaction 回滚事务
+	 * @returns {Promise}
+	 */
+	async rollbackTransaction(){
+		return await new Promise(function(resolve, reject){
+			plus.sqlite.transaction({
+				name: config.name,
+				operation: 'rollback',
+				success: function(e){
+					resolve();
+				},
+				fail: function(e){
+					reject(e);
+				}
+			});
+		})
+	}
+	
 	/**
 	 * @description 执行sql语句
 	 * @param {String} sql : sql语句
 	 * @param {Function} callback :（err,results）=>{}
 	 */
 	sql(sql, callback) {
+		if (!Utils.isString(sql)) {
+			Utils.error('"The type of "sql" is wrong, it should be "String".');
+		}
+		if (callback&&!Utils.isFunction(callback)) {
+			Utils.error('The type of "callback" is wrong, it should be "Function".');
+		}
+		
 		let self = this;
 		self.repair();
 
@@ -449,6 +662,10 @@ class Model {
 	 * @param {Function} callback 
 	 */
 	isExist(callback) {
+		if (callback&&!Utils.isFunction(callback)) {
+			Utils.error('The type of "callback" is wrong, it should be "Function".');
+		}
+		
 		let sql = `SELECT count(*) AS isExist FROM sqlite_master WHERE type='table' AND name='${this.name}'`;
 		let self = this;
 		Utils.log(`isExist: ${sql}`);
@@ -470,6 +687,10 @@ class Model {
 	 * @param {Function} callback 
 	 */
 	drop(callback) {
+		if (callback&&!Utils.isFunction(callback)) {
+			Utils.error('The type of "callback" is wrong, it should be "Function".');
+		}
+		
 		var sql = `DROP TABLE '${this.name}'`;
 		let self = this;
 		self.repair();
@@ -493,6 +714,10 @@ class Model {
 	 * @param {Function} callback 
 	 */
 	create(callback) {
+		if (callback&&!Utils.isFunction(callback)) {
+			Utils.error('The type of "callback" is wrong, it should be "Function".');
+		}
+		
 		let self = this;
 		let sql = Utils.modelSql(self.name, self.options);
 		Utils.log(`create: ${sql}`);
@@ -527,10 +752,7 @@ class Model {
 			}
 		});
 	}
-	// TODO 更新表结构
-	// TODO 数据表备份?? 
-	// TODO 多表联查
-	// TODO 下班了其他的想不起来 回头再说
+	
 }
 
 
@@ -574,6 +796,7 @@ export class usqlite {
 			}
 		});
 	}
+	
 	/**
 	 * @description 断开数据库
 	 * @param {*} callback 
@@ -591,6 +814,7 @@ export class usqlite {
 			}
 		});
 	}
+
 	/**
 	 * @description 创建 Model 对象
 	 * @example
