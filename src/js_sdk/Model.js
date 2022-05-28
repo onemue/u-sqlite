@@ -1,20 +1,20 @@
-import Uilts from "Uilts";
+import Utils from "Utils";
 
 export default class Model {
     // TODO 创建model
     constructor(name, options) {
-		let _this = this;
-		_this.name = name;
-		_this.options = options;
+        let _this = this;
+        _this.name = name;
+        _this.options = options;
 
-		if (config.isConnect) {
-			_this.repair();
-		} else {
-			if(!config.name||!config.path){
-				console.error('"config.name" or "config.path" is empty');
-			}
-			usqlite.connect(config);
-		}
+        if (config.isConnect) {
+            _this.repair();
+        } else {
+            if (!config.name || !config.path) {
+                console.error('"config.name" or "config.path" is empty');
+            }
+            usqlite.connect(config);
+        }
     }
 
     /**
@@ -26,7 +26,7 @@ export default class Model {
         let _this = this;
         let sql = ``;
 
-        if (Uilts.isArray(options)) {
+        if (Utils.isArray(options)) {
             _this.insertBulk(options, callback);
             return _this;
         }
@@ -47,14 +47,14 @@ export default class Model {
         let result;
         _this.beginTransaction(() => {
             try {
-                if (Uilts.isArray(options)) {
+                if (Utils.isArray(options)) {
                     options.forEach(item => {
                         sql = `INSERT INTO ${this.name} (${Object.keys(item).join(',')}) VALUES (${Object.values(item).map(item => `'${item}'`).join(',')})`;
                         result = await _this.queryAsync(sql);
 
                         if (result.code) {
                             let error = result;
-                            
+
                             // 抛出异常回滚
                             throw result;
                         }
@@ -87,7 +87,7 @@ export default class Model {
         let _this = this;
         let options = Array.prototype.slice.call(arguments, 0, arguments.length - 1);
         let callback = arguments[arguments.length - 1];
-        let where = options.find(item => Uilts.isString(item));
+        let where = options.find(item => Utils.isString(item));
         let sql = ``;
         if (where) {
             sql = `DELETE FROM ${this.name} WHERE ${where}`;
@@ -109,8 +109,8 @@ export default class Model {
         let _this = this;
         let options = Array.prototype.slice.call(arguments, 0, arguments.length - 1);
         let callback = arguments[arguments.length - 1];
-        let where = options.find(item => Uilts.isString(item));
-        let data = options.find(item => Uilts.isObject(item));
+        let where = options.find(item => Utils.isString(item));
+        let data = options.find(item => Utils.isObject(item));
         let sql = ``;
 
         if (where) {
@@ -136,8 +136,8 @@ export default class Model {
         let _this = this;
         let options = Array.prototype.slice.call(arguments, 0, arguments.length - 1);
         let callback = arguments[arguments.length - 1];
-        let where = options.find(item => Uilts.isString(item));
-        let columns = options.find(item => Uilts.isArray(item));
+        let where = options.find(item => Utils.isString(item));
+        let columns = options.find(item => Utils.isArray(item));
         let sql = ``;
 
         if (where) {
@@ -336,162 +336,162 @@ export default class Model {
 
 
     static #modelSql(name, options) {
-		let sql;
-		let sqlArr = [];
-		let primaryKeyArr = [];
-		Utils.log('options:' + options);
-		for (const key in options) {
-			if (Object.hasOwnProperty.call(options, key)) {
-				const option = options[key];
-				sqlArr.push(this.#restrain(key, option));
-				if (option.primaryKey == true) {
-					primaryKeyArr.push(key.toString());
-					Utils.log(`${key} is primary key${primaryKeyArr.length}`);
-				}
-			}
-		}
-		
-		Utils.log(primaryKeyArr.length);
-		if (primaryKeyArr.length>1) {
-			
-			sql = `CREATE TABLE '${name}' (${sqlArr.join(', ').replaceAll(' PRIMARY KEY','')}, PRIMARY KEY (${primaryKeyArr.join()}))`;
-		}
-		else{
-			sql = `CREATE TABLE '${name}' (${sqlArr.join(', ')})`;
-		}
-		Utils.log(`modelSql :${sql}`);
-		return sql;
-	}
+        let sql;
+        let sqlArr = [];
+        let primaryKeyArr = [];
+        Utils.log('options:' + options);
+        for (const key in options) {
+            if (Object.hasOwnProperty.call(options, key)) {
+                const option = options[key];
+                sqlArr.push(this.#restrain(key, option));
+                if (option.primaryKey == true) {
+                    primaryKeyArr.push(key.toString());
+                    Utils.log(`${key} is primary key${primaryKeyArr.length}`);
+                }
+            }
+        }
 
-	static #restrain(key, options) {
+        Utils.log(primaryKeyArr.length);
+        if (primaryKeyArr.length > 1) {
 
-		let restrainArray = [];
-		restrainArray.push(`'${key}'`);
+            sql = `CREATE TABLE '${name}' (${sqlArr.join(', ').replaceAll(' PRIMARY KEY', '')}, PRIMARY KEY (${primaryKeyArr.join()}))`;
+        }
+        else {
+            sql = `CREATE TABLE '${name}' (${sqlArr.join(', ')})`;
+        }
+        Utils.log(`modelSql :${sql}`);
+        return sql;
+    }
 
-		// 如果是 String 拦截处理
-		if (options.constructor != Object) {
-			restrainArray.push(_this.#toType(options));
-			return restrainArray.join(' ');
-		}
+    static #restrain(key, options) {
 
-		restrainArray.push(_this.#toType(options.type));
-		
-		// 主键
-		if (options.primaryKey == true) {
-			if(options.autoIncrement != true){
-				restrainArray.push('PRIMARY KEY');
-			}
-		}
-		
-		// 自增
-		if (Utils.isNumber(options.type)&&options.autoIncrement == true) {
-			restrainArray.pop();
-			restrainArray.push('INTEGER');
-			restrainArray.push('PRIMARY KEY');
-			restrainArray.push('AUTOINCREMENT');
-		}
-		
-		// 非空
-		if (options.notNull == true) {
-			restrainArray.push('NOT NULL');
-		}
+        let restrainArray = [];
+        restrainArray.push(`'${key}'`);
 
-		// 默认值
-		if (options.default) {
-			restrainArray.push(`DEFAULT ${options.default}`);
-		}
+        // 如果是 String 拦截处理
+        if (options.constructor != Object) {
+            restrainArray.push(_this.#toType(options));
+            return restrainArray.join(' ');
+        }
 
-		// 是否是不同的值
-		if (options.unique == true) {
-			restrainArray.push('UNIQUE');
-		}
+        restrainArray.push(_this.#toType(options.type));
+
+        // 主键
+        if (options.primaryKey == true) {
+            if (options.autoIncrement != true) {
+                restrainArray.push('PRIMARY KEY');
+            }
+        }
+
+        // 自增
+        if (Utils.isNumber(options.type) && options.autoIncrement == true) {
+            restrainArray.pop();
+            restrainArray.push('INTEGER');
+            restrainArray.push('PRIMARY KEY');
+            restrainArray.push('AUTOINCREMENT');
+        }
+
+        // 非空
+        if (options.notNull == true) {
+            restrainArray.push('NOT NULL');
+        }
+
+        // 默认值
+        if (options.default) {
+            restrainArray.push(`DEFAULT ${options.default}`);
+        }
+
+        // 是否是不同的值
+        if (options.unique == true) {
+            restrainArray.push('UNIQUE');
+        }
 
 
-		// 检查
-		if (options.check) {
-			restrainArray.push(`CHECK(${THIS_VALUE.check})`);
-		}
+        // 检查
+        if (options.check) {
+            restrainArray.push(`CHECK(${THIS_VALUE.check})`);
+        }
 
-		return restrainArray.join(' ');
-	}
+        return restrainArray.join(' ');
+    }
 
-	static #toType(jsType) {
-		let sqliteType = '';
-		if (Utils.isNumber(jsType)) {
-			sqliteType = 'numeric';
-		} else if (Utils.isDate(jsType)) {
-			sqliteType = 'timestamp';
-		} else {
-			sqliteType = 'varchar';
-		}
-		return sqliteType;
-	}
+    static #toType(jsType) {
+        let sqliteType = '';
+        if (Utils.isNumber(jsType)) {
+            sqliteType = 'numeric';
+        } else if (Utils.isDate(jsType)) {
+            sqliteType = 'timestamp';
+        } else {
+            sqliteType = 'varchar';
+        }
+        return sqliteType;
+    }
 
     // TODO 重写创建数据表逻辑以及方法
     /**
-	 * @description 创建数据表 **不推荐**
-	 * @param {Function} callback 
-	 */
-	create(callback) {
-		if (callback&&!Utils.isFunction(callback)) {
-			Utils.error('The type of "callback" is wrong, it should be "Function".');
-		}
-		
-		let _this = this;
-		let sql = Utils.modelSql(_this.name, _this.options);
-		Utils.log(`create: ${sql}`);
-		plus.sqlite.executeSql({
-			name: config.name,
-			sql: sql,
-			success(e) {
-				callback(null, e);
-			},
-			fail(e) {
-				callback(e)
-			}
-		});
-		return this;
-	}
+     * @description 创建数据表 **不推荐**
+     * @param {Function} callback 
+     */
+    create(callback) {
+        if (callback && !Utils.isFunction(callback)) {
+            Utils.error('The type of "callback" is wrong, it should be "Function".');
+        }
+
+        let _this = this;
+        let sql = Utils.modelSql(_this.name, _this.options);
+        Utils.log(`create: ${sql}`);
+        plus.sqlite.executeSql({
+            name: config.name,
+            sql: sql,
+            success(e) {
+                callback(null, e);
+            },
+            fail(e) {
+                callback(e)
+            }
+        });
+        return this;
+    }
 
     repair() {
-		let _this = this;
-		_this.isExist(function (e, r) {
-			if (e) {
-				console.error(e);
-			}
+        let _this = this;
+        _this.isExist(function (e, r) {
+            if (e) {
+                console.error(e);
+            }
 
-			if (!r[0].isExist) {
-				_this.create(function (e, r) {
-					Utils.log(e, r);
-				});
-			}
-		});
-	}
+            if (!r[0].isExist) {
+                _this.create(function (e, r) {
+                    Utils.log(e, r);
+                });
+            }
+        });
+    }
 
 
     /**
-	 * @description 判断是否存在 
-	 * @param {Function} callback 
-	 */
-	isExist(callback) {
-		if (callback&&!Utils.isFunction(callback)) {
-			Utils.error('The type of "callback" is wrong, it should be "Function".');
-		}
-		
-		let sql = `SELECT count(*) AS isExist FROM sqlite_master WHERE type='table' AND name='${this.name}'`;
-		let _this = this;
-		Utils.log(`isExist: ${sql}`);
-		Utils.log(`isExist: ${config.name}`);
-		plus.sqlite.selectSql({
-			name: config.name,
-			sql: sql,
-			success(e) {
-				callback(null, e);
-			},
-			fail(e) {
-				callback(e);
-			}
-		});
-		return this;
-	}
+     * @description 判断是否存在 
+     * @param {Function} callback 
+     */
+    isExist(callback) {
+        if (callback && !Utils.isFunction(callback)) {
+            Utils.error('The type of "callback" is wrong, it should be "Function".');
+        }
+
+        let sql = `SELECT count(*) AS isExist FROM sqlite_master WHERE type='table' AND name='${this.name}'`;
+        let _this = this;
+        Utils.log(`isExist: ${sql}`);
+        Utils.log(`isExist: ${config.name}`);
+        plus.sqlite.selectSql({
+            name: config.name,
+            sql: sql,
+            success(e) {
+                callback(null, e);
+            },
+            fail(e) {
+                callback(e);
+            }
+        });
+        return this;
+    }
 }

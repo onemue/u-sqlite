@@ -2,7 +2,7 @@ let config = {
     deBug: true,
 };
 
-export default class Uilts {
+export default class Utils {
 
 
     static log() {
