@@ -427,7 +427,7 @@ export default class Model {
 		return sqliteType;
 	}
 
-
+    // TODO 重写创建数据表逻辑以及方法
     /**
 	 * @description 创建数据表 **不推荐**
 	 * @param {Function} callback 
